@@ -252,7 +252,7 @@ export function PlayerStatsView({ teams }: PlayerStatsProps) {
   }, [allPlayers, activeRole]);
 
   const isComparisonMode = chartSubMode === 'COMPARISON' && activeRole !== 'ALL';
-  const panelHeightClass = isComparisonMode ? 'h-auto lg:h-[830px]' : 'h-[640px] lg:h-[720px]';
+  const panelHeightClass = isComparisonMode ? 'h-auto lg:h-[calc(100vh-160px)]' : 'h-[640px] lg:h-[calc(100vh-160px)]';
 
   return (
     <div className="flex flex-col h-full gap-4 overflow-hidden">

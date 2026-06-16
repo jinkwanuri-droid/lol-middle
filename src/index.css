@@ -58,3 +58,49 @@ html, body {
   overflow: hidden !important;
   height: 100%;
 }
+
+@keyframes header-breath {
+  0% {
+    opacity: 0.15;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0.45;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes particle-fly {
+  0% {
+    left: -5%;
+    transform: translateY(0) scale(0.2) rotate(0deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: var(--op-max, 0.8);
+    transform: translateY(calc(var(--end-y) * 0.2 + 8px)) scale(0.8) rotate(60deg);
+  }
+  40% {
+    transform: translateY(calc(var(--end-y) * 0.4 - 6px)) scale(1) rotate(120deg);
+  }
+  60% {
+    transform: translateY(calc(var(--end-y) * 0.6 + 5px)) scale(0.7) rotate(200deg);
+  }
+  80% {
+    opacity: var(--op-max, 0.8);
+    transform: translateY(calc(var(--end-y) * 0.8 - 4px)) scale(0.5) rotate(280deg);
+  }
+  100% {
+    left: 105%;
+    transform: translateY(var(--end-y)) scale(var(--scale-end, 0.2)) rotate(var(--rot, 360deg));
+    opacity: 0;
+  }
+}
+
+.animate-header-breath {
+  animation: header-breath 4s ease-in-out infinite alternate;
+}
+
+.animate-particle-fly {
+  animation: particle-fly var(--dur, 3s) linear infinite;
+}

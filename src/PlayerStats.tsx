@@ -326,43 +326,43 @@ export function PlayerStatsView({ teams }: PlayerStatsProps) {
             <table className="w-full text-left border-collapse min-w-[800px]">
               <thead className="sticky top-0 bg-[#111111] z-10 shadow-md">
                 <tr className="border-b border-[#222222] stat-label/th">
-                  <th className="p-4 font-bold w-12 tracking-widest text-[#666666]">#</th>
-                  <th className="p-4 font-black tracking-wider text-[#888] cursor-pointer hover:text-[#00FF41] transition-colors group/th" onClick={() => handleSort('name')}>
+                  <th className="p-4 font-bold w-12 tracking-widest text-[#666666] text-[11px]">#</th>
+                  <th className="p-4 font-black tracking-wider text-[#888] text-[11px] cursor-pointer hover:text-[#00FF41] transition-colors group/th" onClick={() => handleSort('name')}>
                     <span className="flex items-center gap-1 uppercase">
                       Player {renderSortArrow('name')}
                     </span>
                   </th>
-                  <th className="p-4 font-black tracking-wider text-[#888] cursor-pointer hover:text-[#00FF41] transition-colors group/th" onClick={() => handleSort('teamName')}>
+                  <th className="p-4 font-black tracking-wider text-[#888] text-[11px] cursor-pointer hover:text-[#00FF41] transition-colors group/th" onClick={() => handleSort('teamName')}>
                     <span className="flex items-center gap-1 uppercase">
                       Team {renderSortArrow('teamName')}
                     </span>
                   </th>
-                  <th className="p-4 font-black tracking-wider text-[#888] cursor-pointer hover:text-[#00FF41] transition-colors group/th" onClick={() => handleSort('kda')}>
+                  <th className="p-4 font-black tracking-wider text-[#888] text-[11px] cursor-pointer hover:text-[#00FF41] transition-colors group/th" onClick={() => handleSort('kda')}>
                     <span className="flex items-center gap-1 uppercase">
                       Kda {renderSortArrow('kda')}
                     </span>
                   </th>
-                  <th className="p-4 font-black tracking-wider text-[#888] cursor-pointer hover:text-[#00FF41] transition-colors group/th" onClick={() => handleSort('dpm')}>
+                  <th className="p-4 font-black tracking-wider text-[#888] text-[11px] cursor-pointer hover:text-[#00FF41] transition-colors group/th" onClick={() => handleSort('dpm')}>
                     <span className="flex items-center gap-1 uppercase">
                       Dpm {renderSortArrow('dpm')}
                     </span>
                   </th>
-                  <th className="p-4 font-black tracking-wider text-[#888] cursor-pointer hover:text-[#00FF41] transition-colors group/th" onClick={() => handleSort('gpm')}>
+                  <th className="p-4 font-black tracking-wider text-[#888] text-[11px] cursor-pointer hover:text-[#00FF41] transition-colors group/th" onClick={() => handleSort('gpm')}>
                     <span className="flex items-center gap-1 uppercase">
                       Gpm {renderSortArrow('gpm')}
                     </span>
                   </th>
-                  <th className="p-4 font-black tracking-wider text-[#888] cursor-pointer hover:text-[#00FF41] transition-colors group/th" onClick={() => handleSort('csm')}>
+                  <th className="p-4 font-black tracking-wider text-[#888] text-[11px] cursor-pointer hover:text-[#00FF41] transition-colors group/th" onClick={() => handleSort('csm')}>
                     <span className="flex items-center gap-1 uppercase">
                       Csm {renderSortArrow('csm')}
                     </span>
                   </th>
-                  <th className="p-4 font-black tracking-wider text-[#888] cursor-pointer hover:text-[#00FF41] transition-colors group/th" onClick={() => handleSort('dpg')}>
+                  <th className="p-4 font-black tracking-wider text-[#888] text-[11px] cursor-pointer hover:text-[#00FF41] transition-colors group/th" onClick={() => handleSort('dpg')}>
                     <span className="flex items-center gap-1 uppercase">
                       Dpg {renderSortArrow('dpg')}
                     </span>
                   </th>
-                  <th className="p-4 font-black tracking-wider text-[#888] cursor-pointer hover:text-[#00FF41] transition-colors group/th" onClick={() => handleSort('damagePercent')}>
+                  <th className="p-4 font-black tracking-wider text-[#888] text-[11px] cursor-pointer hover:text-[#00FF41] transition-colors group/th" onClick={() => handleSort('damagePercent')}>
                     <span className="flex items-center gap-1 uppercase">
                       Dmg% {renderSortArrow('damagePercent')}
                     </span>

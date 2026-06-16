@@ -1,6 +1,6 @@
 import { Team, Player, Role } from './types';
 import { useState } from 'react';
-import { X, Trophy } from 'lucide-react';
+import { X, Trophy, Calendar } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface TeamStatsProps {
@@ -250,6 +250,8 @@ export function TeamStatsView({ teams }: TeamStatsProps) {
   const [selectedMatch, setSelectedMatch] = useState<MatchInfo | null>(null);
   const [selectedDay, setSelectedDay] = useState<1 | 2 | 3>(1);
   const [direction, setDirection] = useState<number>(1);
+  const [showAllSchedules, setShowAllSchedules] = useState(false);
+  const [highlightTeam, setHighlightTeam] = useState<string>('ALL');
 
   const handleDayChange = (newDay: 1 | 2 | 3) => {
     setDirection(newDay > selectedDay ? 1 : -1);
@@ -308,9 +310,22 @@ export function TeamStatsView({ teams }: TeamStatsProps) {
       <div className="bg-gradient-to-r from-[#0E1E11]/90 via-[#061007]/95 to-[#040804]/90 border border-[#1b3d20]/50 rounded-xl p-4.5 shrink-0 shadow-[0_4px_30px_rgba(0,255,65,0.02)] flex flex-col gap-3.5 relative overflow-hidden">
         {/* Header containing title and Compacter Day Tabs */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 relative z-10 p-1">
-          <h2 className="text-[12px] sm:text-[13px] font-black tracking-[0.2em] text-viper uppercase drop-shadow-[0_0_8px_rgba(0,255,65,0.25)]">
-            Day {selectedDay} Scrim Schedule
-          </h2>
+          <div className="flex items-center gap-2.5">
+            <h2 className="text-[12px] sm:text-[13px] font-black tracking-[0.2em] text-viper uppercase drop-shadow-[0_0_8px_rgba(0,255,65,0.25)]">
+              Day {selectedDay} Scrim Schedule
+            </h2>
+            <button
+              onClick={() => {
+                setHighlightTeam('ALL');
+                setShowAllSchedules(true);
+              }}
+              className="flex items-center gap-1.5 px-2.5 py-1 text-[10.5px] sm:text-[11px] font-bold text-viper/90 border border-viper/30 rounded bg-viper/5 hover:bg-viper/20 hover:border-viper/60 transition-all duration-300 shadow-[0_0_10px_rgba(0,255,65,0.05)] cursor-pointer shrink-0"
+              title="전체 일정 한눈에 보기"
+            >
+              <Calendar className="w-3.5 h-3.5" />
+              <span>전체일정</span>
+            </button>
+          </div>
           
           {/* Custom Tabs */}
           <div className="flex items-center gap-1.5 bg-[#030603] border border-[#1B3F21]/45 p-1 rounded-lg">
@@ -586,7 +601,7 @@ export function TeamStatsView({ teams }: TeamStatsProps) {
                                   (isP2CsBetter ? 1 : 0);
 
                   const renderStatCard = (label: string, value: string | number, isBetter: boolean) => (
-                    <div className={`flex flex-col items-center justify-center py-2 px-1 rounded-xl border transition-all duration-300 ${
+                    <div className={`flex flex-col items-center justify-center py-2 px-1 rounded border transition-all duration-300 ${
                       isBetter 
                         ? 'bg-gradient-to-b from-[#113117] to-[#0A1F0E] border-viper/40 shadow-[0_0_12px_rgba(0,255,65,0.15)] bg-opacity-95' 
                         : 'bg-[#101010]/80 border-white/[0.04]'
@@ -689,6 +704,153 @@ export function TeamStatsView({ teams }: TeamStatsProps) {
           </div>
         );
       })()}
+
+      {/* Full Scrim Schedules Overlay Modal */}
+      {showAllSchedules && (
+        <div 
+          id="all-schedules-overlay"
+          className="fixed inset-0 bg-black/90 backdrop-blur-md z-40 flex items-center justify-center p-4 overflow-y-auto animate-fade-in"
+          onClick={() => setShowAllSchedules(false)}
+        >
+          <div 
+            id="all-schedules-container"
+            className="relative w-full max-w-5xl bg-gradient-to-b from-[#141414] to-[#0A0A0A] border border-white/[0.08] rounded-2xl shadow-[0_0_85px_rgba(0,255,65,0.12)] overflow-hidden flex flex-col max-h-[90vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex justify-between items-center px-6 py-4.5 border-b border-white/[0.05] bg-[#0c0c0c]/80 sticky top-0 z-10 backdrop-blur-md">
+              <div className="flex items-center gap-2.5">
+                <Calendar className="w-5 h-5 text-viper drop-shadow-[0_0_8px_rgba(0,255,65,0.4)]" />
+                <h3 className="text-[13.5px] sm:text-[15px] font-black tracking-widest text-[#E0E0E0] uppercase">
+                  전체 스크림 일정 한눈에 보기
+                </h3>
+              </div>
+              
+              {/* Filter Area & Close button */}
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 bg-[#030603] border border-[#1b3d20]/40 rounded-lg px-2.5 py-1.5 shadow-[inset_0_1px_4px_rgba(0,0,0,0.6)]">
+                  <span className="text-[11px] text-viper/70 font-extrabold uppercase tracking-wider hidden sm:inline">팀 필터:</span>
+                  <select
+                    value={highlightTeam}
+                    onChange={(e) => setHighlightTeam(e.target.value)}
+                    className="bg-transparent text-[11.5px] font-black text-white outline-none cursor-pointer pr-1 focus:ring-0 select-none uppercase tracking-wide"
+                  >
+                    <option value="ALL" className="bg-[#0c0c0c] text-white">전체 팀 보기</option>
+                    {teams.map((t) => {
+                      const cleanName = t.name.replace('TEAM ', '').trim();
+                      return (
+                        <option key={t.id} value={cleanName} className="bg-[#0c0c0c] text-white">
+                          {t.name}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
+                
+                <button 
+                  onClick={() => setShowAllSchedules(false)}
+                  className="p-1.5 text-white/40 hover:text-white/80 hover:bg-white/[0.04] rounded-lg transition-colors cursor-pointer"
+                  title="닫기"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+            
+            {/* Scrollable Content Body */}
+            <div className="p-6 overflow-y-auto flex-1 custom-scrollbar">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+                {([1, 2, 3] as const).map((day) => {
+                  const matches = dayMatches[day];
+                  return (
+                    <div key={day} className="flex flex-col gap-4 bg-[#0a0f0a]/30 border border-[#1b3d20]/15 p-4 rounded-xl min-h-[300px]">
+                      {/* Day Header */}
+                      <div className="flex items-center justify-between border-b border-[#1b3d20]/30 pb-2.5">
+                        <span className="text-[11.5px] font-black text-viper tracking-[0.15em] uppercase drop-shadow-[0_0_6px_rgba(0,255,65,0.2)]">
+                          DAY {day} SCHEDULE
+                        </span>
+                        <span className="text-[11px] text-white/40 font-bold">
+                          {matches.length} matches
+                        </span>
+                      </div>
+                      
+                      {/* Day Match List */}
+                      <div className="flex flex-col gap-2.5">
+                        {matches.length > 0 ? (
+                          matches.map((match) => {
+                            // 필터링 시 팀의 이름과 매치에 기록된 텍스트가 정확히 일치하는지 확인 (공백 제거 포함)
+                            const isSelectedTeamInMatch = highlightTeam !== 'ALL' && (
+                              match.t1.trim() === highlightTeam.trim() || 
+                              match.t2.trim() === highlightTeam.trim()
+                            );
+                            const isDimmed = highlightTeam !== 'ALL' && !isSelectedTeamInMatch;
+                            
+                            return (
+                              <div 
+                                key={match.id} 
+                                onClick={() => {
+                                  setSelectedMatch(match);
+                                }}
+                                className={`p-3 rounded-lg flex flex-col gap-2 border transition-all duration-300 cursor-pointer ${
+                                  isSelectedTeamInMatch
+                                    ? 'bg-gradient-to-b from-[#113117] to-[#0A1F0E] border-viper shadow-[0_0_15px_rgba(0,255,65,0.25)] scale-[1.02] ring-1 ring-viper/50 z-10'
+                                    : isDimmed
+                                      ? 'bg-[#030603]/10 border-[#1B3F21]/10 opacity-20 scale-[0.98]'
+                                      : 'bg-[#030603]/85 border-[#1B3F21]/30 hover:bg-[#071308] hover:border-viper/60'
+                                }`}
+                              >
+                                <div className="flex justify-between items-center mb-0.5">
+                                  <span className={`text-[11px] font-black transition-colors ${
+                                    isSelectedTeamInMatch ? 'text-viper drop-shadow-[0_0_4px_rgba(0,255,65,0.3)]' : 'text-viper/60'
+                                  }`}>{match.id}</span>
+                                  <span className={`text-[11px] font-bold ${
+                                    isSelectedTeamInMatch ? 'text-white/80' : 'text-white/50'
+                                  }`}>{match.result}</span>
+                                </div>
+                                
+                                <div className={`flex flex-col text-[13px] font-bold gap-1 transition-colors ${
+                                  isSelectedTeamInMatch ? 'text-white' : 'text-white/80'
+                                }`}>
+                                  <div className="flex justify-between items-center h-4">
+                                    <span className={`truncate transition-all ${
+                                      highlightTeam !== 'ALL' && match.t1 === highlightTeam ? 'text-viper font-black pl-1' : ''
+                                    }`}>{match.t1}</span>
+                                    {match.result !== '-' && (
+                                      <span className={match.result.split(':')[0] > match.result.split(':')[1] ? 'text-viper font-black' : 'text-white/60 font-medium'}>
+                                        {match.result.split(':')[0]}
+                                      </span>
+                                    )}
+                                  </div>
+                                  
+                                  <div className="flex justify-between items-center h-4">
+                                    <span className={`truncate transition-all ${
+                                      highlightTeam !== 'ALL' && match.t2 === highlightTeam ? 'text-viper font-black pl-1' : ''
+                                    }`}>{match.t2}</span>
+                                    {match.result !== '-' && (
+                                      <span className={match.result.split(':')[1] > match.result.split(':')[0] ? 'text-viper font-black' : 'text-white/60 font-medium'}>
+                                        {match.result.split(':')[1]}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })
+                        ) : (
+                          <div className="py-12 px-4 text-center border border-dashed border-[#1B3F21]/20 rounded-xl bg-[#030603]/45 flex flex-col items-center justify-center gap-1.5 mt-2">
+                            <span className="text-[10px] font-black text-viper/50 drop-shadow-[0_0_4px_rgba(0,255,65,0.15)] tracking-widest uppercase">DAY 3 SCRIMS PREPARING</span>
+                            <span className="text-[11px] text-white/35 font-medium">스크림 일정이 아직 등록되지 않았습니다</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

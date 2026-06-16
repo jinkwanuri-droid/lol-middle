@@ -1,0 +1,6 @@
+{
+  "name": "중간계 롤대회 전적 대시보드",
+  "description": "중간계 VIPER 리그 스크림 성적 및 선수 기록을 확인하는 대시보드",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

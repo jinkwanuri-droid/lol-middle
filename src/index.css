@@ -1,0 +1,60 @@
+@import url('https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/variable/woff2/SUIT-Variable.css');
+@import "tailwindcss";
+
+@theme {
+  --color-viper: #00FF41;
+  --color-viper-dark: #00CC33;
+  --color-viper-muted: rgba(0, 255, 65, 0.1);
+  --color-surface: #111111;
+  --color-surface-hover: #1A1A1A;
+  --color-background: #050505;
+  
+  --font-sans: "SUIT Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "SUIT Variable", ui-monospace, SFMono-Regular, monospace;
+}
+
+body {
+  background-color: var(--color-background);
+  color: #E0E0E0;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.viper-glow {
+  box-shadow: 0 0 15px rgba(0,255,65,0.15);
+}
+
+.card-bg {
+  background-color: #111111;
+  border: 1px solid #222222;
+}
+
+.stat-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #666666;
+}
+
+.data-row {
+  border-bottom: 1px solid #1A1A1A;
+}
+
+/* Hide scrollbars for any elements with custom-scrollbar or no-scrollbar */
+.custom-scrollbar::-webkit-scrollbar,
+.no-scrollbar::-webkit-scrollbar {
+  display: none !important;
+}
+
+.custom-scrollbar,
+.no-scrollbar {
+  -ms-overflow-style: none !important;  /* IE and Edge */
+  scrollbar-width: none !important;  /* Firefox */
+}
+
+/* Hide default browser scrollbars on body/html to avoid double scrollbars */
+html, body {
+  overflow: hidden !important;
+  height: 100%;
+}

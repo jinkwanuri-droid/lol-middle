@@ -13,16 +13,16 @@ export default function App() {
   const teams = initialTeams; // In a real app, this would be fetched or managed via state
 
   // Create flying glowing sparks/flame particles
-  const particles = Array.from({ length: 30 }).map((_, i) => {
-    const top = `${15 + (i * 17) % 70}%`;
-    const durationNum = 4.0 + (i * 1.3) % 4.0;
+  const particles = Array.from({ length: 65 }).map((_, i) => {
+    const top = `${10 + (i * 13) % 80}%`;
+    const durationNum = 3.5 + (i * 0.8) % 4.5;
     const duration = `${durationNum.toFixed(2)}s`;
-    const delay = `-${((i * 2.7) % durationNum).toFixed(2)}s`;
-    const size = `${(1.0 + (i * 0.7) % 1.5).toFixed(1)}px`;
-    const endY = `${(-10 - (i * 5) % 30)}px`;
-    const scaleEnd = (0.3 + (i * 0.1) % 0.6).toFixed(2);
-    const rot = `${180 + (i * 33) % 180}deg`;
-    const opMax = (0.5 + (i * 0.2) % 0.5).toFixed(2);
+    const delay = `-${((i * 1.9) % durationNum).toFixed(2)}s`;
+    const size = `${(0.8 + (i * 0.5) % 1.6).toFixed(1)}px`; // 좀 더 작게 해달라고 하셨으므로 (0.8 ~ 2.4px 사이)
+    const endY = `${(-15 - (i * 7) % 35)}px`;
+    const scaleEnd = (0.2 + (i * 0.08) % 0.5).toFixed(2);
+    const rot = `${120 + (i * 27) % 240}deg`;
+    const opMax = (0.4 + (i * 0.15) % 0.55).toFixed(2);
     const colors = [
       'bg-[#00FF41]',
       'bg-[#39FF14]',
@@ -41,8 +41,8 @@ export default function App() {
       <header className="relative flex flex-col md:flex-row md:justify-between md:items-end border border-white/[0.04] bg-neutral-950/35 rounded-2xl p-5 gap-4 flex-shrink-0 overflow-hidden">
         {/* Breathing ambient green background */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl">
-          <div className="absolute inset-0 bg-gradient-to-r from-viper/0 via-viper/[0.04] to-viper/0 animate-header-breath" style={{ animationDuration: '6s' }} />
-          <div className="absolute -left-1/4 -right-1/4 -top-1/2 bottom-0 bg-[radial-gradient(ellipse_at_center,rgba(0,255,65,0.08)_0%,transparent_60%)] animate-header-breath" style={{ animationDuration: '4s', animationDelay: '1s' }} />
+          <div className="absolute inset-0 bg-gradient-to-r from-viper/0 via-viper/[0.12] to-viper/0 animate-header-breath" style={{ animationDuration: '6s' }} />
+          <div className="absolute -left-1/4 -right-1/4 -top-1/2 bottom-0 bg-[radial-gradient(ellipse_at_center,rgba(0,255,65,0.16)_0%,transparent_55%)] animate-header-breath" style={{ animationDuration: '3.5s', animationDelay: '0.5s' }} />
         </div>
 
         {/* Flying spark particles (left-to-right) */}

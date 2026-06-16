@@ -247,10 +247,10 @@ export function TeamStatsView({ teams }: TeamStatsProps) {
               <div className="relative z-10">
                 <div className="flex justify-between items-center mb-3">
                   <div className="flex items-center gap-2.5">
-                    <div className="flex items-center justify-center w-7 h-7 rounded bg-viper/10 text-viper font-black text-[11px] border border-viper/20 shadow-[0_0_10px_rgba(0,255,65,0.05)] transition-all group-hover:scale-105 duration-300">
+                    <div className="flex items-center justify-center w-7.5 h-7.5 rounded bg-viper/10 text-viper font-black text-[12px] border border-viper/20 shadow-[0_0_10px_rgba(0,255,65,0.05)] transition-all group-hover:scale-105 duration-300">
                       #{index + 1}
                     </div>
-                    <h2 className="text-xs font-black tracking-widest text-[#E0E0E0] uppercase group-hover:text-white transition-colors duration-200">
+                    <h2 className="text-[13px] font-black tracking-widest text-[#E0E0E0] uppercase group-hover:text-white transition-colors duration-200">
                       {team.name}
                     </h2>
                   </div>
@@ -258,34 +258,36 @@ export function TeamStatsView({ teams }: TeamStatsProps) {
 
                 <div className="grid grid-cols-3 gap-2">
                   <div className="bg-gradient-to-b from-[#1C1C1C] to-[#121212] p-2 rounded-lg border border-white/[0.03] flex flex-col justify-center transition-all group-hover:border-white/[0.06] duration-300">
-                    <span className="stat-label mb-0.5 text-[8px] tracking-widest text-white/40 font-extrabold uppercase">Record</span>
-                    <span className="text-[12.5px] font-black text-white">{team.stats.wins}W {team.stats.losses}L</span>
-                    <span className="text-[9.5px] font-black text-viper mt-0.5">{winRate}% WR</span>
+                    <span className="stat-label mb-0.5 text-[9.5px] tracking-widest text-white/40 font-extrabold uppercase">Record</span>
+                    <span className="text-[13.5px] font-black text-white">{team.stats.wins}W {team.stats.losses}L</span>
+                    <span className="text-[10.5px] font-black text-viper mt-0.5">{winRate}% WR</span>
                   </div>
                   <div className="bg-gradient-to-b from-[#1C1C1C] to-[#121212] p-2 rounded-lg border border-white/[0.03] flex flex-col justify-center transition-all group-hover:border-white/[0.06] duration-300">
-                    <span className="stat-label mb-0.5 text-[8px] tracking-widest text-white/40 font-extrabold uppercase">K/D/A</span>
-                    <span className="text-[11px] font-black tracking-tight text-white/90 leading-tight">{team.stats.kills}/{team.stats.deaths}/{team.stats.assists}</span>
-                    <span className="text-[8.5px] text-white/30 font-bold mt-1">TOTAL</span>
+                    <span className="stat-label mb-0.5 text-[9.5px] tracking-widest text-white/40 font-extrabold uppercase">K/D/A</span>
+                    <span className="text-[12px] font-black tracking-tight text-white/90 leading-tight">{team.stats.kills}/{team.stats.deaths}/{team.stats.assists}</span>
+                    <span className="text-[9.5px] text-white/30 font-bold mt-1">TOTAL</span>
                   </div>
                   <div className="bg-gradient-to-b from-[#1C1C1C] to-[#121212] p-2 rounded-lg border border-white/[0.03] flex flex-col justify-center transition-all group-hover:border-white/[0.06] duration-300">
-                    <span className="stat-label mb-0.5 text-[8px] tracking-widest text-white/40 font-extrabold uppercase">KDA</span>
-                    <span className="text-sm font-black text-viper leading-none">{kda}</span>
-                    <span className="text-[8.5px] text-white/30 font-bold mt-1">AVERAGE</span>
+                    <span className="stat-label mb-0.5 text-[9.5px] tracking-widest text-white/40 font-extrabold uppercase">KDA</span>
+                    <span className="text-[15px] font-black text-viper leading-none">{kda}</span>
+                    <span className="text-[9.5px] text-white/30 font-bold mt-1">AVERAGE</span>
                   </div>
                 </div>
               </div>
 
               <div className="flex flex-col border-t border-white/[0.05] pt-2 mt-1.5 relative z-10 w-full">
-                <div className="text-[8px] font-black tracking-widest text-[#E0E0E0]/30 uppercase mb-1.5">H2H RECORDS • 상대 전적</div>
+                <div className="text-[10px] font-black tracking-widest text-viper uppercase mb-1.5 drop-shadow-[0_0_6px_rgba(0,255,65,0.3)] flex items-center gap-1">
+                  <span>상대전적 :</span>
+                </div>
                 <div className="grid grid-cols-2 gap-x-2 gap-y-1">
                   {team.headToHead.map((h2h) => {
                     return (
                       <div key={h2h.opponentId} className="flex justify-between items-center bg-[#101010]/50 border border-white/[0.02] py-1 px-1.5 rounded-lg hover:border-viper/20 hover:bg-[#0d130e]/30 transition-all duration-200 group/h2h">
                         <div className="flex items-center gap-1.5 min-w-0">
                           <div className="w-[3px] h-2 bg-white/10 rounded-full shrink-0 group-hover/h2h:bg-viper transition-all" />
-                          <span className="text-[10px] font-bold text-white/50 group-hover/h2h:text-white/80 transition-colors truncate">{h2h.opponentName}</span>
+                          <span className="text-[11px] font-bold text-white/60 group-hover/h2h:text-white transition-colors truncate">vs {h2h.opponentName}</span>
                         </div>
-                        <div className="flex items-center gap-1 shrink-0 font-mono text-[9px] font-bold">
+                        <div className="flex items-center gap-1 shrink-0 font-mono text-[10px] font-bold">
                           <span className={h2h.wins > 0 ? 'text-viper font-black' : 'text-white/30'}>{h2h.wins}W</span>
                           <span className="text-white/20">-</span>
                           <span className={h2h.losses > 0 ? 'text-red-400 font-extrabold' : 'text-white/30'}>{h2h.losses}L</span>

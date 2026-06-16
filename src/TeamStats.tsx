@@ -1,6 +1,7 @@
 import { Team, Player, Role } from './types';
 import { useState } from 'react';
 import { X, Trophy } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 
 interface TeamStatsProps {
   teams: Team[];
@@ -138,11 +139,122 @@ const matchCSData: Record<string, Record<Role, { p1: number[]; p2: number[] }>> 
     MID: { p1: [151, 285], p2: [190, 243] },
     BOT: { p1: [229, 259], p2: [179, 292] },
     SUP: { p1: [29, 31], p2: [29, 65] }
+  },
+  // Day 2
+  'M2-1': {
+    TOP: { p1: [245, 173], p2: [256, 188] },
+    JGL: { p1: [255, 148], p2: [295, 149] },
+    MID: { p1: [351, 162], p2: [286, 193] },
+    BOT: { p1: [312, 228], p2: [295, 236] },
+    SUP: { p1: [31, 23], p2: [39, 21] }
+  },
+  'M2-2': {
+    TOP: { p1: [263, 229], p2: [225, 188] },
+    JGL: { p1: [204, 197], p2: [241, 195] },
+    MID: { p1: [272, 259], p2: [222, 278] },
+    BOT: { p1: [203, 266], p2: [263, 253] },
+    SUP: { p1: [37, 30], p2: [23, 53] }
+  },
+  'M2-3': {
+    TOP: { p1: [192, 270], p2: [232, 252] },
+    JGL: { p1: [209, 234], p2: [185, 197] },
+    MID: { p1: [272, 281], p2: [239, 266] },
+    BOT: { p1: [239, 291], p2: [204, 284] },
+    SUP: { p1: [22, 34], p2: [32, 51] }
+  },
+  'M2-4': {
+    TOP: { p1: [195, 106], p2: [227, 130] },
+    JGL: { p1: [201, 130], p2: [158, 103] },
+    MID: { p1: [207, 144], p2: [179, 129] },
+    BOT: { p1: [214, 145], p2: [241, 134] },
+    SUP: { p1: [32, 25], p2: [15, 23] }
+  },
+  'M2-5': {
+    TOP: { p1: [219, 197], p2: [210, 174] },
+    JGL: { p1: [211, 151], p2: [214, 108] },
+    MID: { p1: [246, 201], p2: [203, 186] },
+    BOT: { p1: [279, 166], p2: [270, 169] },
+    SUP: { p1: [44, 26], p2: [40, 26] }
+  },
+  'M2-6': {
+    TOP: { p1: [240, 239], p2: [223, 259] },
+    JGL: { p1: [236, 248], p2: [226, 241] },
+    MID: { p1: [234, 302], p2: [219, 305] },
+    BOT: { p1: [279, 290], p2: [303, 238] },
+    SUP: { p1: [27, 29], p2: [38, 49] }
+  },
+  'M2-7': {
+    TOP: { p1: [167, 260], p2: [179, 283] },
+    JGL: { p1: [142, 216], p2: [131, 243] },
+    MID: { p1: [167, 253], p2: [170, 237] },
+    BOT: { p1: [165, 327], p2: [188, 317] },
+    SUP: { p1: [21, 43], p2: [24, 37] }
+  },
+  'M2-8': {
+    TOP: { p1: [169, 278], p2: [141, 256] },
+    JGL: { p1: [148, 211], p2: [136, 262] },
+    MID: { p1: [136, 250], p2: [151, 306] },
+    BOT: { p1: [174, 237], p2: [176, 248] },
+    SUP: { p1: [28, 33], p2: [21, 28] }
+  },
+  'M2-9': {
+    TOP: { p1: [299, 253], p2: [401, 255] },
+    JGL: { p1: [342, 238], p2: [197, 216] },
+    MID: { p1: [400, 307], p2: [406, 323] },
+    BOT: { p1: [334, 340], p2: [405, 399] },
+    SUP: { p1: [43, 47], p2: [33, 26] }
   }
+};
+
+const dayMatches: Record<1 | 2 | 3, MatchInfo[]> = {
+  1: [
+    { id: 'M1-1', t1: '저라뎃', t2: '나는상윤', result: '1:1' },
+    { id: 'M1-2', t1: '준밧드', t2: '스맵', result: '1:1' },
+    { id: 'M1-3', t1: '클리드', t2: '서도일', result: '2:0' },
+    { id: 'M1-4', t1: '저라뎃', t2: '클리드', result: '1:1' },
+    { id: 'M1-5', t1: '준밧드', t2: '나는상윤', result: '1:1' },
+    { id: 'M1-6', t1: '스맵', t2: '서도일', result: '2:0' },
+    { id: 'M1-7', t1: '저라뎃', t2: '서도일', result: '1:1' },
+    { id: 'M1-8', t1: '클리드', t2: '스맵', result: '1:1' },
+  ],
+  2: [
+    { id: 'M2-1', t1: '준밧드', t2: '클리드', result: '1:1' },
+    { id: 'M2-2', t1: '나는상윤', t2: '서도일', result: '1:1' },
+    { id: 'M2-3', t1: '저라뎃', t2: '스맵', result: '2:0' },
+    { id: 'M2-4', t1: '클리드', t2: '나는상윤', result: '2:0' },
+    { id: 'M2-5', t1: '스맵', t2: '서도일', result: '2:0' },
+    { id: 'M2-6', t1: '저라뎃', t2: '준밧드', result: '2:0' },
+    { id: 'M2-7', t1: '클리드', t2: '저라뎃', result: '2:0' },
+    { id: 'M2-8', t1: '준밧드', t2: '서도일', result: '1:1' },
+    { id: 'M2-9', t1: '스맵', t2: '나는상윤', result: '2:1' },
+  ],
+  3: []
+};
+
+const slideVariants = {
+  enter: (direction: number) => ({
+    y: direction > 0 ? 40 : -40,
+    opacity: 0
+  }),
+  center: {
+    y: 0,
+    opacity: 1
+  },
+  exit: (direction: number) => ({
+    y: direction > 0 ? -40 : 40,
+    opacity: 0
+  })
 };
 
 export function TeamStatsView({ teams }: TeamStatsProps) {
   const [selectedMatch, setSelectedMatch] = useState<MatchInfo | null>(null);
+  const [selectedDay, setSelectedDay] = useState<1 | 2 | 3>(1);
+  const [direction, setDirection] = useState<number>(1);
+
+  const handleDayChange = (newDay: 1 | 2 | 3) => {
+    setDirection(newDay > selectedDay ? 1 : -1);
+    setSelectedDay(newDay);
+  };
 
   // Sort teams by wins, then by KDA
   const sortedTeams = [...teams].sort((a, b) => {
@@ -192,41 +304,86 @@ export function TeamStatsView({ teams }: TeamStatsProps) {
 
   return (
     <div className="flex flex-col gap-6 h-full overflow-hidden">
-      {/* Scrim Schedule Section - Balanced Grid for All Screens */}
-      <div className="bg-gradient-to-r from-[#0E1E11]/90 via-[#061007]/95 to-[#040804]/90 border border-[#1b3d20]/50 rounded-xl p-4.5 shrink-0 shadow-[0_4px_30px_rgba(0,255,65,0.02)]">
-        <h2 className="text-[10px] font-black tracking-[0.2em] text-viper uppercase mb-3 drop-shadow-[0_0_8px_rgba(0,255,65,0.25)]">Day 1 Scrim Schedule</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-8 gap-3">
-          {[
-            { id: 'M1-1', t1: '저라뎃', t2: '나는상윤', result: '1:1' },
-            { id: 'M1-2', t1: '준밧드', t2: '스맵', result: '1:1' },
-            { id: 'M1-3', t1: '클리드', t2: '서도일', result: '2:0' },
-            { id: 'M1-4', t1: '저라뎃', t2: '클리드', result: '1:1' },
-            { id: 'M1-5', t1: '준밧드', t2: '나는상윤', result: '1:1' },
-            { id: 'M1-6', t1: '스맵', t2: '서도일', result: '2:0' },
-            { id: 'M1-7', t1: '저라뎃', t2: '서도일', result: '1:1' },
-            { id: 'M1-8', t1: '클리드', t2: '스맵', result: '1:1' },
-          ].map((match) => (
-            <div 
-              key={match.id} 
-              onClick={() => setSelectedMatch(match)}
-              className="bg-[#030603]/85 border border-[#1B3F21]/30 p-2.5 rounded-lg flex flex-col gap-1.5 transition-all duration-300 hover:bg-[#071308] hover:border-viper/45 group shadow-md hover:shadow-[0_4px_12px_rgba(0,255,65,0.08)] cursor-pointer"
+      {/* Scrim Schedule Section - Balanced Grid with tabs & slide animations */}
+      <div className="bg-gradient-to-r from-[#0E1E11]/90 via-[#061007]/95 to-[#040804]/90 border border-[#1b3d20]/50 rounded-xl p-4.5 shrink-0 shadow-[0_4px_30px_rgba(0,255,65,0.02)] flex flex-col gap-3.5 relative overflow-hidden">
+        {/* Header containing title and Compacter Day Tabs */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 relative z-10 p-1">
+          <h2 className="text-[12px] sm:text-[13px] font-black tracking-[0.2em] text-viper uppercase drop-shadow-[0_0_8px_rgba(0,255,65,0.25)]">
+            Day {selectedDay} Scrim Schedule
+          </h2>
+          
+          {/* Custom Tabs */}
+          <div className="flex items-center gap-1.5 bg-[#030603] border border-[#1B3F21]/45 p-1 rounded-lg">
+            {([1, 2, 3] as const).map((day) => (
+              <button
+                key={day}
+                onClick={() => handleDayChange(day)}
+                className={`relative px-4 sm:px-5 py-1.5 text-[12px] font-black tracking-wider uppercase rounded-md transition-all duration-300 ${
+                  selectedDay === day 
+                    ? 'text-white' 
+                    : 'text-white/50 hover:text-white/90'
+                }`}
+              >
+                {selectedDay === day && (
+                  <motion.div
+                    layoutId="activeDayTab"
+                    className="absolute inset-0 bg-gradient-to-r from-[#1E4D27] to-[#123118] border border-[#2e6e39]/60 rounded-md -z-10 shadow-[0_0_12px_rgba(0,255,65,0.12)]"
+                    transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                  />
+                )}
+                {day}일차
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Sliding Area */}
+        <div className="overflow-hidden relative min-h-[480px] md:min-h-[290px] xl:min-h-[90px] w-full">
+          <AnimatePresence initial={false} custom={direction} mode="wait">
+            <motion.div
+              key={selectedDay}
+              custom={direction}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+              className="w-full relative z-10"
             >
-              <div className="flex justify-between items-center">
-                <span className="text-[10px] font-black text-viper/55 group-hover:text-viper transition-colors">{match.id}</span>
-                <span className="text-[10px] font-bold text-white/35">{match.result}</span>
-              </div>
-              <div className="flex flex-col text-[11px] font-bold text-white/70">
-                <div className="flex justify-between items-center h-4">
-                  <span className="truncate group-hover:text-white transition-colors">{match.t1}</span>
-                  {match.result !== '-' && <span className={match.result.startsWith('2') ? 'text-viper font-black' : 'text-white/40 font-semibold'}>{match.result.split(':')[0]}</span>}
+              {dayMatches[selectedDay].length > 0 ? (
+                <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-9 gap-2.5 sm:gap-3">
+                  {dayMatches[selectedDay].map((match) => (
+                    <div 
+                      key={match.id} 
+                      onClick={() => setSelectedMatch(match)}
+                      className="bg-[#030603]/85 border border-[#1B3F21]/30 p-3 rounded-xl flex flex-col gap-2 transition-all duration-300 hover:bg-[#071308] hover:border-viper/60 group shadow-md hover:shadow-[0_4px_12px_rgba(0,255,65,0.12)] cursor-pointer"
+                    >
+                      <div className="flex justify-between items-center mb-0.5">
+                        <span className="text-[11px] font-black text-viper/60 group-hover:text-viper transition-colors">{match.id}</span>
+                        <span className="text-[11px] font-bold text-white/50">{match.result}</span>
+                      </div>
+                      <div className="flex flex-col text-[13px] font-bold text-white/80 gap-1">
+                        <div className="flex justify-between items-center h-4">
+                          <span className="truncate group-hover:text-white transition-colors">{match.t1}</span>
+                          {match.result !== '-' && <span className={match.result.split(':')[0] > match.result.split(':')[1] ? 'text-viper font-black' : 'text-white/70 font-bold'}>{match.result.split(':')[0]}</span>}
+                        </div>
+                        <div className="flex justify-between items-center h-4">
+                          <span className="truncate group-hover:text-white transition-colors">{match.t2}</span>
+                          {match.result !== '-' && <span className={match.result.split(':')[1] > match.result.split(':')[0] ? 'text-viper font-black' : 'text-white/70 font-bold'}>{match.result.split(':')[1]}</span>}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <div className="flex justify-between items-center h-4">
-                  <span className="truncate group-hover:text-white transition-colors">{match.t2}</span>
-                  {match.result !== '-' && <span className={match.result.endsWith('2') ? 'text-viper font-black' : 'text-white/40 font-semibold'}>{match.result.split(':')[1]}</span>}
+              ) : (
+                <div className="flex flex-col items-center justify-center min-h-[480px] md:min-h-[290px] xl:min-h-[90px] py-5 sm:py-6 text-center border border-dashed border-[#1B3F21]/35 rounded-xl bg-gradient-to-b from-[#030603] to-[#081208]/20 relative overflow-hidden">
+                  <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,rgba(0,255,65,0.03)_0%,transparent_70%)]" />
+                  <span className="text-[9px] font-black text-viper/70 drop-shadow-[0_0_8px_rgba(0,255,65,0.3)] tracking-[0.25em] mb-1 uppercase">Day 3 Scrims Preparing</span>
+                  <span className="text-[11px] text-white/40 font-semibold">3일차 스크림 일정이 아직 등록되지 않았습니다</span>
                 </div>
-              </div>
-            </div>
-          ))}
+              )}
+            </motion.div>
+          </AnimatePresence>
         </div>
       </div>
 
@@ -246,51 +403,51 @@ export function TeamStatsView({ teams }: TeamStatsProps) {
               
               <div className="relative z-10">
                 <div className="flex justify-between items-center mb-3">
-                  <div className="flex items-center gap-2.5">
-                    <div className="flex items-center justify-center w-7.5 h-7.5 rounded bg-viper/10 text-viper font-black text-[12px] border border-viper/20 shadow-[0_0_10px_rgba(0,255,65,0.05)] transition-all group-hover:scale-105 duration-300">
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-center w-8 h-8 rounded bg-viper/10 text-viper font-black text-[13px] border border-viper/20 shadow-[0_0_10px_rgba(0,255,65,0.05)] transition-all group-hover:scale-105 duration-300">
                       #{index + 1}
                     </div>
-                    <h2 className="text-[13px] font-black tracking-widest text-[#E0E0E0] uppercase group-hover:text-white transition-colors duration-200">
+                    <h2 className="text-[15px] font-black tracking-widest text-[#E0E0E0] uppercase group-hover:text-white transition-colors duration-200">
                       {team.name}
                     </h2>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-2">
-                  <div className="bg-gradient-to-b from-[#1C1C1C] to-[#121212] p-2 rounded-lg border border-white/[0.03] flex flex-col justify-center transition-all group-hover:border-white/[0.06] duration-300">
-                    <span className="stat-label mb-0.5 text-[9.5px] tracking-widest text-white/40 font-extrabold uppercase">Record</span>
-                    <span className="text-[13.5px] font-black text-white">{team.stats.wins}W {team.stats.losses}L</span>
-                    <span className="text-[10.5px] font-black text-viper mt-0.5">{winRate}% WR</span>
+                <div className="grid grid-cols-3 gap-2.5">
+                  <div className="bg-gradient-to-b from-[#1C1C1C] to-[#121212] p-2.5 rounded-xl border border-white/[0.03] flex flex-col justify-center transition-all group-hover:border-white/[0.06] duration-300">
+                    <span className="stat-label mb-1 text-[10px] tracking-widest text-white/50 font-bold uppercase">Record</span>
+                    <span className="text-[15px] font-black text-white">{team.stats.wins}W {team.stats.losses}L</span>
+                    <span className="text-[11px] font-black text-viper mt-0.5">{winRate}% WR</span>
                   </div>
-                  <div className="bg-gradient-to-b from-[#1C1C1C] to-[#121212] p-2 rounded-lg border border-white/[0.03] flex flex-col justify-center transition-all group-hover:border-white/[0.06] duration-300">
-                    <span className="stat-label mb-0.5 text-[9.5px] tracking-widest text-white/40 font-extrabold uppercase">K/D/A</span>
-                    <span className="text-[12px] font-black tracking-tight text-white/90 leading-tight">{team.stats.kills}/{team.stats.deaths}/{team.stats.assists}</span>
-                    <span className="text-[9.5px] text-white/30 font-bold mt-1">TOTAL</span>
+                  <div className="bg-gradient-to-b from-[#1C1C1C] to-[#121212] p-2.5 rounded-xl border border-white/[0.03] flex flex-col justify-center transition-all group-hover:border-white/[0.06] duration-300">
+                    <span className="stat-label mb-1 text-[10px] tracking-widest text-white/50 font-bold uppercase">K/D/A</span>
+                    <span className="text-[13px] font-black tracking-tight text-white/90 leading-tight">{team.stats.kills}/{team.stats.deaths}/{team.stats.assists}</span>
+                    <span className="text-[10px] text-white/40 font-bold mt-1">TOTAL</span>
                   </div>
-                  <div className="bg-gradient-to-b from-[#1C1C1C] to-[#121212] p-2 rounded-lg border border-white/[0.03] flex flex-col justify-center transition-all group-hover:border-white/[0.06] duration-300">
-                    <span className="stat-label mb-0.5 text-[9.5px] tracking-widest text-white/40 font-extrabold uppercase">KDA</span>
-                    <span className="text-[15px] font-black text-viper leading-none">{kda}</span>
-                    <span className="text-[9.5px] text-white/30 font-bold mt-1">AVERAGE</span>
+                  <div className="bg-gradient-to-b from-[#1C1C1C] to-[#121212] p-2.5 rounded-xl border border-white/[0.03] flex flex-col justify-center transition-all group-hover:border-white/[0.06] duration-300">
+                    <span className="stat-label mb-1 text-[10px] tracking-widest text-white/50 font-bold uppercase">KDA</span>
+                    <span className="text-[17px] font-black text-viper leading-none">{kda}</span>
+                    <span className="text-[10px] text-white/40 font-bold mt-1">AVERAGE</span>
                   </div>
                 </div>
               </div>
 
-              <div className="flex flex-col border-t border-white/[0.05] pt-2 mt-1.5 relative z-10 w-full">
-                <div className="text-[10px] font-black tracking-widest text-viper uppercase mb-1.5 drop-shadow-[0_0_6px_rgba(0,255,65,0.3)] flex items-center gap-1">
+              <div className="flex flex-col border-t border-white/[0.05] pt-3 mt-2 relative z-10 w-full">
+                <div className="text-[11px] font-black tracking-widest text-viper uppercase mb-2 drop-shadow-[0_0_6px_rgba(0,255,65,0.3)] flex items-center gap-1">
                   <span>상대전적 :</span>
                 </div>
-                <div className="grid grid-cols-2 gap-x-2 gap-y-1">
+                <div className="grid grid-cols-2 gap-x-2.5 gap-y-1.5">
                   {team.headToHead.map((h2h) => {
                     return (
-                      <div key={h2h.opponentId} className="flex justify-between items-center bg-[#101010]/50 border border-white/[0.02] py-1 px-1.5 rounded-lg hover:border-viper/20 hover:bg-[#0d130e]/30 transition-all duration-200 group/h2h">
-                        <div className="flex items-center gap-1.5 min-w-0">
-                          <div className="w-[3px] h-2 bg-white/10 rounded-full shrink-0 group-hover/h2h:bg-viper transition-all" />
-                          <span className="text-[11px] font-bold text-white/60 group-hover/h2h:text-white transition-colors truncate">vs {h2h.opponentName}</span>
+                      <div key={h2h.opponentId} className="flex justify-between items-center bg-[#101010]/60 border border-white/[0.03] py-1.5 px-2 rounded-lg hover:border-viper/30 hover:bg-[#0d130e]/40 transition-all duration-200 group/h2h">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <div className="w-[3px] h-2.5 bg-white/20 rounded-full shrink-0 group-hover/h2h:bg-viper transition-all" />
+                          <span className="text-[12px] font-bold text-white/70 group-hover/h2h:text-white transition-colors truncate">vs {h2h.opponentName}</span>
                         </div>
-                        <div className="flex items-center gap-1 shrink-0 font-mono text-[10px] font-bold">
-                          <span className={h2h.wins > 0 ? 'text-viper font-black' : 'text-white/30'}>{h2h.wins}W</span>
-                          <span className="text-white/20">-</span>
-                          <span className={h2h.losses > 0 ? 'text-red-400 font-extrabold' : 'text-white/30'}>{h2h.losses}L</span>
+                        <div className="flex items-center gap-1.5 shrink-0 font-mono text-[11px] font-bold">
+                          <span className={h2h.wins > 0 ? 'text-viper font-black' : 'text-white/40'}>{h2h.wins}W</span>
+                          <span className="text-white/30">-</span>
+                          <span className={h2h.losses > 0 ? 'text-red-400 font-extrabold' : 'text-white/40'}>{h2h.losses}L</span>
                         </div>
                       </div>
                     );
@@ -326,10 +483,10 @@ export function TeamStatsView({ teams }: TeamStatsProps) {
                 >
                   <X className="w-5 h-5" />
                 </button>
-
+ 
                 <div className="flex flex-col items-center">
                   <span className="text-[10px] font-black tracking-[0.3em] text-viper mb-1 uppercase">
-                    MATCH PREVIEW &amp; ANALYSIS • {selectedMatch.id}
+                    MATCH REVIEW &amp; ANALYSIS • {selectedMatch.id}
                   </span>
                   
                   {/* Scoreboard line */}
@@ -428,14 +585,31 @@ export function TeamStatsView({ teams }: TeamStatsProps) {
                                   (isP2DpgBetter ? 1 : 0) +
                                   (isP2CsBetter ? 1 : 0);
 
+                  const renderStatCard = (label: string, value: string | number, isBetter: boolean) => (
+                    <div className={`flex flex-col items-center justify-center py-2 px-1 rounded-xl border transition-all duration-300 ${
+                      isBetter 
+                        ? 'bg-gradient-to-b from-[#113117] to-[#0A1F0E] border-viper/40 shadow-[0_0_12px_rgba(0,255,65,0.15)] bg-opacity-95' 
+                        : 'bg-[#101010]/80 border-white/[0.04]'
+                    }`}>
+                      <span className={`text-[7px] sm:text-[8px] font-light uppercase tracking-widest leading-none mb-1.5 ${
+                        isBetter ? 'text-viper/70' : 'text-white/30'
+                      }`}>{label}</span>
+                      <span className={`font-mono text-[10px] sm:text-[12px] font-bold leading-none ${
+                        isBetter ? 'text-white drop-shadow-[0_0_4px_rgba(0,255,65,0.3)]' : 'text-white/45'
+                      }`}>
+                        {value}
+                      </span>
+                    </div>
+                  );
+
                   return (
                     <div 
                       key={role} 
-                      className={`relative border rounded-xl px-4 py-2.5 transition-all duration-300 overflow-hidden ${
+                      className={`relative border rounded-xl px-4 py-3 transition-all duration-300 overflow-hidden ${
                         p1Score > p2Score 
-                          ? 'border-viper/15 bg-gradient-to-r from-viper/[0.03] via-zinc-900/95 to-zinc-950/70 shadow-[0_0_20px_rgba(0,255,65,0.03)]'
+                          ? 'border-viper/15 bg-gradient-to-r from-viper/[0.03] via-[#101010]/95 to-[#0b0c0b]/70 shadow-[0_0_20px_rgba(0,255,65,0.03)]'
                           : p2Score > p1Score
-                            ? 'border-viper/15 bg-gradient-to-l from-viper/[0.03] via-zinc-900/95 to-zinc-950/70 shadow-[0_0_20px_rgba(0,255,65,0.03)]'
+                            ? 'border-viper/15 bg-gradient-to-l from-viper/[0.03] via-[#101010]/95 to-[#0b0c0b]/70 shadow-[0_0_20px_rgba(0,255,65,0.03)]'
                             : 'border-white/[0.04] bg-[#121212]/70'
                       }`}
                     >
@@ -453,139 +627,47 @@ export function TeamStatsView({ teams }: TeamStatsProps) {
                         </>
                       )}
 
-                      {/* Single Compact Container */}
-                      <div id={`match-role-${role}-row`} className="relative z-10 flex items-center justify-between gap-1 sm:gap-1.5 md:gap-3">
-                        {/* 1. Left Player (Width fixed for alignment, made responsive to prevent clipping) */}
-                        <div className="w-[85px] xs:w-[105px] sm:w-[125px] text-left flex flex-col shrink-0">
-                          <div className="flex items-center gap-0.5 sm:gap-1 flex-wrap">
-                            <span className={`text-[11.5px] xs:text-[12px] sm:text-xs font-black transition-colors truncate max-w-[55px] xs:max-w-[75px] sm:max-w-none ${p1Score > p2Score ? 'text-viper drop-shadow-[0_0_6px_rgba(0,255,65,0.4)]' : 'text-white'}`}>
-                              {p1.name}
-                            </span>
-                            {p1Score > p2Score && (
-                              <span className="text-[6.5px] sm:text-[7px] font-black tracking-tighter bg-viper/20 text-viper py-0.5 px-0.5 sm:px-1 rounded border border-viper/40 animate-pulse uppercase scale-90 origin-left">
-                                ADV
-                              </span>
-                            )}
-                          </div>
-                          <span className="text-[8.5px] sm:text-[9px] text-white/40 font-semibold truncate mt-0.5 max-w-[80px] xs:max-w-[100px] sm:max-w-[120px]">
-                            {selectedMatch.t1} • {p1.summonerName || p1.name}
+                      {/* Single Compact Container - Grid based to prevent overlap entirely */}
+                      <div id={`match-role-${role}-row`} className="relative z-10 grid grid-cols-[80px_1fr_40px_1fr_80px] sm:grid-cols-[100px_1fr_56px_1fr_100px] justify-between items-center gap-2 sm:gap-5 w-full">
+                        {/* 1. Left Player */}
+                        <div className="text-left flex flex-col justify-center min-w-0 pr-1">
+                          <span className={`text-[12px] sm:text-[14px] font-black tracking-wide transition-colors truncate max-w-full leading-none ${p1Score > p2Score ? 'text-viper drop-shadow-[0_0_6px_rgba(0,255,65,0.4)]' : 'text-[#E0E0E0]'}`}>
+                            {p1.name}
                           </span>
                         </div>
 
-                        {/* 2. Left Player Stats Area (Responsive gaps to prevent clutter) */}
-                        <div className="flex-1 flex justify-end items-center gap-1 sm:gap-2 px-0.5 sm:px-1 text-right select-none min-w-0">
-                          {/* KDA */}
-                          <div className={`flex flex-col items-end py-0.5 px-1 sm:px-1.5 rounded transition-all ${isP1KdaBetter ? 'bg-viper/[0.04] border border-viper/10' : ''}`}>
-                            <span className="text-[6.5px] sm:text-[7.5px] font-bold text-white/25 uppercase tracking-wider leading-none">KDA</span>
-                            <span className={`font-mono text-[9.5px] sm:text-[11px] leading-tight ${isP1KdaBetter ? 'text-viper font-black drop-shadow-[0_0_4px_rgba(0,255,65,0.2)]' : 'text-white/50 font-medium'}`}>
-                              {p1Stats.kdaStr}
-                            </span>
-                          </div>
-                          
-                          {/* DPM */}
-                          <div className={`flex flex-col items-end py-0.5 px-1 sm:px-1.5 rounded transition-all ${isP1DpmBetter ? 'bg-viper/[0.04] border border-viper/10' : ''}`}>
-                            <span className="text-[6.5px] sm:text-[7.5px] font-bold text-white/25 uppercase tracking-wider leading-none">DPM</span>
-                            <span className={`font-mono text-[9.5px] sm:text-[11px] leading-tight ${isP1DpmBetter ? 'text-viper font-black drop-shadow-[0_0_4px_rgba(0,255,65,0.2)]' : 'text-white/50 font-medium'}`}>
-                              {p1Stats.dpm}
-                            </span>
-                          </div>
-
-                          {/* DPG */}
-                          <div className={`flex flex-col items-end py-0.5 px-1 sm:px-1.5 rounded transition-all ${isP1DpgBetter ? 'bg-viper/[0.04] border border-viper/10' : ''}`}>
-                            <span className="text-[6.5px] sm:text-[7.5px] font-bold text-white/25 uppercase tracking-wider leading-none">DPG</span>
-                            <span className={`font-mono text-[9.5px] sm:text-[11px] leading-tight ${isP1DpgBetter ? 'text-viper font-black drop-shadow-[0_0_4px_rgba(0,255,65,0.2)]' : 'text-white/50 font-medium'}`}>
-                              {p1Stats.dpgStr}
-                            </span>
-                          </div>
-
-                          {/* DMG% */}
-                          <div className={`flex flex-col items-end py-0.5 px-1 sm:px-1.5 rounded transition-all ${isP1DmgBetter ? 'bg-viper/[0.04] border border-viper/10' : ''}`}>
-                            <span className="text-[6.5px] sm:text-[7.5px] font-bold text-white/25 uppercase tracking-wider leading-none">DMG%</span>
-                            <span className={`font-mono text-[9.5px] sm:text-[11px] leading-tight ${isP1DmgBetter ? 'text-viper font-black drop-shadow-[0_0_4px_rgba(0,255,65,0.2)]' : 'text-white/50 font-medium'}`}>
-                              {p1Stats.dmgPct}%
-                            </span>
-                          </div>
-
-                          {/* CS - Match Average CS */}
-                          {csRecord && (
-                            <div className={`flex flex-col items-end py-0.5 px-1 sm:px-1.5 rounded transition-all ${isP1CsBetter ? 'bg-viper/[0.04] border border-viper/10' : ''}`}>
-                              <span className="text-[6.5px] sm:text-[7.5px] font-bold text-white/25 uppercase tracking-wider leading-none">CS</span>
-                              <span className={`font-mono text-[9.5px] sm:text-[11px] leading-tight ${isP1CsBetter ? 'text-viper font-black drop-shadow-[0_0_4px_rgba(0,255,65,0.2)]' : 'text-white/50 font-medium'}`}>
-                                {p1AvgCs}
-                              </span>
-                            </div>
-                          )}
+                        {/* 2. Left Player Stats Area */}
+                        <div className="grid grid-cols-5 gap-1.5 sm:gap-2.5 text-center min-w-0 select-none">
+                          {renderStatCard('KDA', p1Stats.kdaStr, isP1KdaBetter)}
+                          {renderStatCard('DPM', p1Stats.dpm, isP1DpmBetter)}
+                          {renderStatCard('DPG', p1Stats.dpgStr, isP1DpgBetter)}
+                          {renderStatCard('DMG%', `${p1Stats.dmgPct}%`, isP1DmgBetter)}
+                          {renderStatCard('CS', csRecord ? p1AvgCs : '-', isP1CsBetter)}
                         </div>
 
-                        {/* 3. Center Position Icon */}
-                        <div id={`match-role-${role}-badge`} className="flex flex-col items-center shrink-0 mx-0.5 sm:mx-1 select-none">
-                          <div className="w-7 sm:w-8.5 h-7 sm:h-8.5 rounded-full bg-gradient-to-b from-[#2C2C2C] to-[#121212] border border-white/[0.08] flex items-center justify-center text-white shadow-md">
-                            <RoleIcon role={role} className="w-3.5 sm:w-4 h-3.5 sm:h-4 text-white" />
+                        {/* 3. Center Position Icon with Role name */}
+                        <div id={`match-role-${role}-badge`} className="flex flex-col items-center justify-center shrink-0 select-none">
+                          <div className="w-8 sm:w-9 h-8 sm:h-9 rounded-full bg-gradient-to-b from-[#252525] to-[#0a0a0a] border border-white/[0.08] flex items-center justify-center text-white shadow-md">
+                            <RoleIcon role={role} className="w-4 sm:w-4.5 h-4 sm:h-4.5 text-white/90" />
                           </div>
-                          <span className="text-[6.5px] sm:text-[7.5px] font-black text-viper/50 tracking-widest uppercase mt-0.5">
+                          <span className="text-[8px] sm:text-[9.5px] font-black text-viper/85 tracking-wider uppercase mt-1.5 drop-shadow-[0_0_4px_rgba(0,255,65,0.25)]">
                             {role}
                           </span>
                         </div>
 
-                        {/* 4. Right Player Stats Area (Responsive gaps to prevent clutter) */}
-                        <div className="flex-1 flex justify-start items-center gap-1 sm:gap-2 px-0.5 sm:px-1 text-left select-none min-w-0">
-                          {/* KDA */}
-                          <div className={`flex flex-col items-start py-0.5 px-1 sm:px-1.5 rounded transition-all ${isP2KdaBetter ? 'bg-viper/[0.04] border border-viper/10' : ''}`}>
-                            <span className="text-[6.5px] sm:text-[7.5px] font-bold text-white/25 uppercase tracking-wider leading-none">KDA</span>
-                            <span className={`font-mono text-[9.5px] sm:text-[11px] leading-tight ${isP2KdaBetter ? 'text-viper font-black drop-shadow-[0_0_4px_rgba(0,255,65,0.2)]' : 'text-white/50 font-medium'}`}>
-                              {p2Stats.kdaStr}
-                            </span>
-                          </div>
-
-                          {/* DPM */}
-                          <div className={`flex flex-col items-start py-0.5 px-1 sm:px-1.5 rounded transition-all ${isP2DpmBetter ? 'bg-viper/[0.04] border border-viper/10' : ''}`}>
-                            <span className="text-[6.5px] sm:text-[7.5px] font-bold text-white/25 uppercase tracking-wider leading-none">DPM</span>
-                            <span className={`font-mono text-[9.5px] sm:text-[11px] leading-tight ${isP2DpmBetter ? 'text-viper font-black drop-shadow-[0_0_4px_rgba(0,255,65,0.2)]' : 'text-white/50 font-medium'}`}>
-                              {p2Stats.dpm}
-                            </span>
-                          </div>
-
-                          {/* DPG */}
-                          <div className={`flex flex-col items-start py-0.5 px-1 sm:px-1.5 rounded transition-all ${isP2DpgBetter ? 'bg-viper/[0.04] border border-viper/10' : ''}`}>
-                            <span className="text-[6.5px] sm:text-[7.5px] font-bold text-white/25 uppercase tracking-wider leading-none">DPG</span>
-                            <span className={`font-mono text-[9.5px] sm:text-[11px] leading-tight ${isP2DpgBetter ? 'text-viper font-black drop-shadow-[0_0_4px_rgba(0,255,65,0.2)]' : 'text-white/50 font-medium'}`}>
-                              {p2Stats.dpgStr}
-                            </span>
-                          </div>
-
-                          {/* DMG% */}
-                          <div className={`flex flex-col items-start py-0.5 px-1 sm:px-1.5 rounded transition-all ${isP2DmgBetter ? 'bg-viper/[0.04] border border-viper/10' : ''}`}>
-                            <span className="text-[6.5px] sm:text-[7.5px] font-bold text-white/25 uppercase tracking-wider leading-none">DMG%</span>
-                            <span className={`font-mono text-[9.5px] sm:text-[11px] leading-tight ${isP2DmgBetter ? 'text-viper font-black drop-shadow-[0_0_4px_rgba(0,255,65,0.2)]' : 'text-white/50 font-medium'}`}>
-                              {p2Stats.dmgPct}%
-                            </span>
-                          </div>
-
-                          {/* CS - Match Average CS */}
-                          {csRecord && (
-                            <div className={`flex flex-col items-start py-0.5 px-1 sm:px-1.5 rounded transition-all ${isP2CsBetter ? 'bg-viper/[0.04] border border-viper/10' : ''}`}>
-                              <span className="text-[6.5px] sm:text-[7.5px] font-bold text-white/25 uppercase tracking-wider leading-none">CS</span>
-                              <span className={`font-mono text-[9.5px] sm:text-[11px] leading-tight ${isP2CsBetter ? 'text-viper font-black drop-shadow-[0_0_4px_rgba(0,255,65,0.2)]' : 'text-white/50 font-medium'}`}>
-                                {p2AvgCs}
-                              </span>
-                            </div>
-                          )}
+                        {/* 4. Right Player Stats Area */}
+                        <div className="grid grid-cols-5 gap-1.5 sm:gap-2.5 text-center min-w-0 select-none">
+                          {renderStatCard('KDA', p2Stats.kdaStr, isP2KdaBetter)}
+                          {renderStatCard('DPM', p2Stats.dpm, isP2DpmBetter)}
+                          {renderStatCard('DPG', p2Stats.dpgStr, isP2DpgBetter)}
+                          {renderStatCard('DMG%', `${p2Stats.dmgPct}%`, isP2DmgBetter)}
+                          {renderStatCard('CS', csRecord ? p2AvgCs : '-', isP2CsBetter)}
                         </div>
 
-                        {/* 5. Right Player (Width fixed for alignment, made responsive to prevent clipping) */}
-                        <div className="w-[85px] xs:w-[105px] sm:w-[125px] text-right flex flex-col items-end shrink-0">
-                          <div className="flex items-center gap-0.5 sm:gap-1 flex-wrap justify-end">
-                            {p2Score > p1Score && (
-                              <span className="text-[6.5px] sm:text-[7px] font-black tracking-tighter bg-viper/40 text-viper py-0.5 px-0.5 sm:px-1 rounded border border-viper/40 animate-pulse uppercase scale-90 origin-right">
-                                ADV
-                              </span>
-                            )}
-                            <span className={`text-[11.5px] xs:text-[12px] sm:text-xs font-black transition-colors truncate max-w-[55px] xs:max-w-[75px] sm:max-w-none ${p2Score > p1Score ? 'text-viper drop-shadow-[0_0_6px_rgba(0,255,65,0.4)]' : 'text-white'}`}>
-                              {p2.name}
-                            </span>
-                          </div>
-                          <span className="text-[8.5px] sm:text-[9px] text-white/40 font-semibold truncate mt-0.5 max-w-[80px] xs:max-w-[100px] sm:max-w-[120px]">
-                            {selectedMatch.t2} • {p2.summonerName || p2.name}
+                        {/* 5. Right Player */}
+                        <div className="text-right flex flex-col justify-center items-end min-w-0 pl-1">
+                          <span className={`text-[12px] sm:text-[14px] font-black tracking-wide transition-colors truncate max-w-full leading-none ${p2Score > p1Score ? 'text-viper drop-shadow-[0_0_6px_rgba(0,255,65,0.4)]' : 'text-[#E0E0E0]'}`}>
+                            {p2.name}
                           </span>
                         </div>
                       </div>

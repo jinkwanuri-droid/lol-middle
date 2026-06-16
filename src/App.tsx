@@ -2,7 +2,7 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { initialTeams } from './data';
 import { TeamStatsView } from './TeamStats';
 import { PlayerStatsView } from './PlayerStats';

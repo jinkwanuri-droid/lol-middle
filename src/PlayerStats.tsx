@@ -606,6 +606,8 @@ export function PlayerStatsView({ teams }: PlayerStatsProps) {
                                         className="w-11 h-11 rounded-lg border border-white/15 object-cover group-hover/champ:scale-105 transition-transform"
                                         loading="lazy"
                                         fetchPriority="high"
+                                        decoding="async"
+                                        crossOrigin="anonymous"
                                         onError={(e) => { 
                                           if (champ.id !== 'Unknown') {
                                             e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzMzMyIvPjx0ZXh0IHg9IjUwIiB5PSI2NSIgZm9udC1zaXplPSI1MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiPj88L3RleHQ+PC9zdmc+'; 

@@ -1503,6 +1503,8 @@ export function TeamStatsView({ teams, rawMatches }: TeamStatsProps) {
                                                 alt={champ.name}
                                                 className="w-6 h-6 rounded-sm object-cover border border-white/5 group-hover/champ:scale-110 transition-transform"
                                                 loading="lazy"
+                                                decoding="async"
+                                                crossOrigin="anonymous"
                                                 referrerPolicy="no-referrer"
                                                 onError={(e) => {
                                                   if (champ.id !== "Unknown") {

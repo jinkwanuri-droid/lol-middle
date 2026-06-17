@@ -331,45 +331,45 @@ export function PlayerStatsView({ teams }: PlayerStatsProps) {
           >
             <table className="w-full text-left border-collapse min-w-[800px]">
               <thead className="sticky top-0 bg-[#111111] z-10 shadow-md">
-                <tr className="border-b border-[#222222] stat-label/th">
-                  <th className="p-4 font-bold w-12 tracking-widest text-[#666666] text-[11px]">#</th>
-                  <th className="p-4 font-black tracking-wider text-[#888] text-[11px] cursor-pointer hover:text-[#00FF41] transition-colors group/th" onClick={() => handleSort('name')}>
-                    <span className="flex items-center gap-1 uppercase">
+                <tr className="border-b border-[#222222] uppercase">
+                  <th className="p-4 font-bold w-[50px] tracking-widest text-[#666666] text-[11px]">#</th>
+                  <th className="p-4 font-black tracking-wider text-[#888] text-[11px] cursor-pointer hover:text-[#00FF41] transition-colors group/th w-[180px]" onClick={() => handleSort('name')}>
+                    <span className="flex items-center gap-1">
                       Player {renderSortArrow('name')}
                     </span>
                   </th>
-                  <th className="p-4 font-black tracking-wider text-[#888] text-[11px] cursor-pointer hover:text-[#00FF41] transition-colors group/th" onClick={() => handleSort('teamName')}>
-                    <span className="flex items-center gap-1 uppercase">
+                  <th className="p-4 font-black tracking-wider text-[#888] text-[11px] cursor-pointer hover:text-[#00FF41] transition-colors group/th w-[160px]" onClick={() => handleSort('teamName')}>
+                    <span className="flex items-center gap-1">
                       Team {renderSortArrow('teamName')}
                     </span>
                   </th>
-                  <th className="p-4 font-black tracking-wider text-[#888] text-[11px] cursor-pointer hover:text-[#00FF41] transition-colors group/th" onClick={() => handleSort('kda')}>
-                    <span className="flex items-center gap-1 uppercase">
+                  <th className="p-4 font-black tracking-wider text-[#888] text-[11px] cursor-pointer hover:text-[#00FF41] transition-colors group/th w-[100px]" onClick={() => handleSort('kda')}>
+                    <span className="flex items-center gap-1">
                       Kda {renderSortArrow('kda')}
                     </span>
                   </th>
-                  <th className="p-4 font-black tracking-wider text-[#888] text-[11px] cursor-pointer hover:text-[#00FF41] transition-colors group/th" onClick={() => handleSort('dpm')}>
-                    <span className="flex items-center gap-1 uppercase">
+                  <th className="p-4 font-black tracking-wider text-[#888] text-[11px] cursor-pointer hover:text-[#00FF41] transition-colors group/th w-[100px]" onClick={() => handleSort('dpm')}>
+                    <span className="flex items-center gap-1">
                       Dpm {renderSortArrow('dpm')}
                     </span>
                   </th>
-                  <th className="p-4 font-black tracking-wider text-[#888] text-[11px] cursor-pointer hover:text-[#00FF41] transition-colors group/th" onClick={() => handleSort('gpm')}>
-                    <span className="flex items-center gap-1 uppercase">
+                  <th className="p-4 font-black tracking-wider text-[#888] text-[11px] cursor-pointer hover:text-[#00FF41] transition-colors group/th w-[100px]" onClick={() => handleSort('gpm')}>
+                    <span className="flex items-center gap-1">
                       Gpm {renderSortArrow('gpm')}
                     </span>
                   </th>
-                  <th className="p-4 font-black tracking-wider text-[#888] text-[11px] cursor-pointer hover:text-[#00FF41] transition-colors group/th" onClick={() => handleSort('csm')}>
-                    <span className="flex items-center gap-1 uppercase">
+                  <th className="p-4 font-black tracking-wider text-[#888] text-[11px] cursor-pointer hover:text-[#00FF41] transition-colors group/th w-[90px]" onClick={() => handleSort('csm')}>
+                    <span className="flex items-center gap-1">
                       Csm {renderSortArrow('csm')}
                     </span>
                   </th>
-                  <th className="p-4 font-black tracking-wider text-[#888] text-[11px] cursor-pointer hover:text-[#00FF41] transition-colors group/th" onClick={() => handleSort('dpg')}>
-                    <span className="flex items-center gap-1 uppercase">
+                  <th className="p-4 font-black tracking-wider text-[#888] text-[11px] cursor-pointer hover:text-[#00FF41] transition-colors group/th w-[80px]" onClick={() => handleSort('dpg')}>
+                    <span className="flex items-center gap-1">
                       Dpg {renderSortArrow('dpg')}
                     </span>
                   </th>
-                  <th className="p-4 font-black tracking-wider text-[#888] text-[11px] cursor-pointer hover:text-[#00FF41] transition-colors group/th" onClick={() => handleSort('damagePercent')}>
-                    <span className="flex items-center gap-1 uppercase">
+                  <th className="p-4 font-black tracking-wider text-[#888] text-[11px] cursor-pointer hover:text-[#00FF41] transition-colors group/th w-[80px]" onClick={() => handleSort('damagePercent')}>
+                    <span className="flex items-center gap-1">
                       Dmg% {renderSortArrow('damagePercent')}
                     </span>
                   </th>
@@ -384,25 +384,25 @@ export function PlayerStatsView({ teams }: PlayerStatsProps) {
                       setViewMode('CHART');
                       if (activeRole === 'ALL') setActiveRole(p.role);
                     }}
-                    className="data-row hover:bg-viper/5 cursor-pointer transition-colors group border-b border-white/[0.03]"
+                    className={`data-row hover:bg-viper/10 cursor-pointer transition-colors group border-b border-white/[0.03] ${idx === 0 ? 'rank-one-highlight relative z-0' : ''}`}
                   >
-                    <td className="p-4 text-white/30 text-xs">{idx + 1}</td>
-                    <td className="p-4">
+                    <td className="p-4 text-white/30 text-xs w-[50px]">{idx + 1}</td>
+                    <td className="p-4 w-[180px]">
                       <div className="flex items-center gap-3">
-                        <div className="w-1 h-4 bg-white/20 group-hover:bg-[#00FF41] transition-colors"></div>
-                        <span className="font-medium text-sm text-[#E0E0E0]">{p.name}</span>
+                        <div className={`w-1 h-4 transition-colors ${idx === 0 ? 'bg-[#00FF41]' : 'bg-white/20 group-hover:bg-[#00FF41]'}`}></div>
+                        <span className="font-medium text-sm text-[#E0E0E0] truncate">{p.name}</span>
                         {activeRole === 'ALL' && (
-                          <span className="text-[10px] text-[#00FF41] font-bold border border-[#00FF41]/30 px-1 rounded-sm bg-[#00FF41]/10">{p.role}</span>
+                          <span className="text-[10px] text-[#00FF41] font-bold border border-[#00FF41]/30 px-1 rounded-sm bg-[#00FF41]/10 shrink-0">{p.role}</span>
                         )}
                       </div>
                     </td>
-                    <td className="p-4 text-xs font-bold text-white/50">{p.teamName}</td>
-                    <td className="p-4 font-medium text-[#00FF41]">{p.kda.toFixed(2)}</td>
-                    <td className="p-4 text-sm text-white/80">{p.stats.dpm}</td>
-                    <td className="p-4 text-sm text-white/80">{p.stats.gpm}</td>
-                    <td className="p-4 text-sm text-white/80">{p.stats.csm}</td>
-                    <td className="p-4 text-sm text-white/80">{p.stats.dpg}</td>
-                    <td className="p-4 text-xs text-white/50">{p.stats.damagePercent}%</td>
+                    <td className="p-4 text-xs font-bold text-white/50 w-[160px] truncate">{p.teamName}</td>
+                    <td className="p-4 font-black text-[#00FF41] w-[100px]">{p.kda.toFixed(2)}</td>
+                    <td className="p-4 text-sm text-white/80 w-[100px]">{p.stats.dpm}</td>
+                    <td className="p-4 text-sm text-white/80 w-[100px]">{p.stats.gpm}</td>
+                    <td className="p-4 text-sm text-white/80 w-[90px]">{p.stats.csm}</td>
+                    <td className="p-4 text-sm text-white/80 w-[80px]">{p.stats.dpg}</td>
+                    <td className="p-4 text-xs text-white/50 w-[80px]">{p.stats.damagePercent}%</td>
                   </tr>
                 ))}
               </tbody>

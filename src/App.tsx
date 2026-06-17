@@ -27,9 +27,16 @@ export default function App() {
     try {
       const response = await fetch('/api/matches');
       if (!response.ok) {
-        const data = await response.json();
-        setErrorDetails(data.details || null);
-        throw new Error(data.error || '데이터를 가져오지 못했습니다.');
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const data = await response.json();
+          setErrorDetails(data.details || null);
+          throw new Error(data.error || '데이터를 가져오지 못했습니다.');
+        } else {
+          const text = await response.text();
+          console.error("Non-JSON error response:", text);
+          throw new Error(`서버 오류 (HTTP ${response.status}). 시트 아이디가 정확한지, 혹은 환경변수(VITE_GOOGLE_SHEET_ID)가 설정되었는지 확인해주세요.`);
+        }
       }
       const matches = await response.json();
       if (Array.isArray(matches) && matches.length > 0) {

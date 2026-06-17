@@ -105,6 +105,42 @@ html, body {
   animation: particle-fly var(--dur, 3s) linear infinite;
 }
 
+@keyframes rank-one-pulse {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes advantage-flow {
+  0% {
+    background-position: 0% 50%;
+    opacity: 0.6;
+  }
+  50% {
+    background-position: 100% 50%;
+    opacity: 1;
+  }
+  100% {
+    background-position: 0% 50%;
+    opacity: 0.6;
+  }
+}
+
+.rank-one-highlight {
+  background: linear-gradient(90deg, transparent 0%, rgba(0, 255, 65, 0.08) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: rank-one-pulse 6s linear infinite;
+}
+
+.advantage-highlight {
+  background: linear-gradient(90deg, transparent 0%, rgba(0, 255, 65, 0.15) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: advantage-flow 6s ease-in-out infinite alternate;
+}
+
 /* Google Sign-In Button Styles */
 .gsi-material-button {
   -moz-user-select: none;

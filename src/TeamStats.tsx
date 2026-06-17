@@ -644,6 +644,25 @@ export function TeamStatsView({ teams, rawMatches }: TeamStatsProps) {
             (h) => h.opponentId === selectedTeam1.id,
           );
 
+          const matchSpecificRecords = rawMatches?.filter(m => m.matchId === selectedMatch.id) || [];
+          const t1SpecificRecords = matchSpecificRecords.filter(m => m.teamName.includes(selectedMatch.t1));
+          const t2SpecificRecords = matchSpecificRecords.filter(m => m.teamName.includes(selectedMatch.t2));
+
+          const t1TotalKills = t1SpecificRecords.reduce((sum, r) => sum + r.kills, 0);
+          const t1TotalDeaths = t1SpecificRecords.reduce((sum, r) => sum + r.deaths, 0);
+          const t1TotalAssists = t1SpecificRecords.reduce((sum, r) => sum + r.assists, 0);
+          const t1TotalGold = t1SpecificRecords.reduce((sum, r) => sum + r.gold, 0);
+
+          const t2TotalKills = t2SpecificRecords.reduce((sum, r) => sum + r.kills, 0);
+          const t2TotalDeaths = t2SpecificRecords.reduce((sum, r) => sum + r.deaths, 0);
+          const t2TotalAssists = t2SpecificRecords.reduce((sum, r) => sum + r.assists, 0);
+          const t2TotalGold = t2SpecificRecords.reduce((sum, r) => sum + r.gold, 0);
+
+          const t1KdaRes = ((t1TotalKills + t1TotalAssists) / Math.max(1, t1TotalDeaths)).toFixed(2);
+          const t2KdaRes = ((t2TotalKills + t2TotalAssists) / Math.max(1, t2TotalDeaths)).toFixed(2);
+          const t1GoldK = (t1TotalGold / 1000).toFixed(0) + 'K';
+          const t2GoldK = (t2TotalGold / 1000).toFixed(0) + 'K';
+
           return (
             <div
               id="match-details-overlay"
@@ -672,34 +691,43 @@ export function TeamStatsView({ teams, rawMatches }: TeamStatsProps) {
                     {/* Scoreboard line */}
                     <div className="flex items-center justify-between w-full mt-4 px-2">
                       {/* Left Team block */}
-                      <div className="flex-1 text-right flex flex-col items-end pr-3">
-                        <span className="text-base font-black text-[#E0E0E0] uppercase tracking-wide">
-                          {selectedTeam1.name}
-                        </span>
-                        <div className="flex flex-col text-[11px] mt-1.5 text-white/40 leading-tight">
-                          <div>
-                            총전적:{" "}
-                            <span className="text-white/80 font-bold">
-                              {selectedTeam1.stats.wins}승{" "}
-                              {selectedTeam1.stats.losses}패
-                            </span>
-                            <span className="text-viper font-black ml-1">
-                              (
-                              {Math.round(
-                                (selectedTeam1.stats.wins /
-                                  Math.max(1, selectedTeam1.stats.games)) *
-                                  100,
-                              )}
-                              %)
-                            </span>
-                          </div>
-                          <div className="mt-0.5">
-                            상대전적:{" "}
-                            <span className="text-viper font-black">
-                              {team1H2H
-                                ? `${team1H2H.wins}승 ${team1H2H.losses}패`
-                                : "0승 0패"}
-                            </span>
+                      <div className="flex-1 flex items-center justify-end gap-x-4">
+                        <div className="hidden sm:flex flex-col items-center justify-center border border-dashed border-white/10 rounded-xl px-4 py-2 bg-white/[0.015] min-w-[90px] backdrop-blur-[1px]">
+                           <span className="text-[9px] font-black text-viper/50 uppercase tracking-tighter mb-0.5">TEAM KDA</span>
+                           <span className="text-[13px] font-mono font-black text-white">{t1KdaRes}</span>
+                           <div className="w-full h-[1px] bg-white/5 my-1.5"></div>
+                           <span className="text-[9px] font-black text-viper/50 uppercase tracking-tighter mb-0.5">TEAM GOLD</span>
+                           <span className="text-[13px] font-mono font-black text-white">{t1GoldK}</span>
+                        </div>
+                        <div className="text-right flex flex-col items-end pr-3">
+                          <span className="text-base font-black text-[#E0E0E0] uppercase tracking-wide">
+                            {selectedTeam1.name}
+                          </span>
+                          <div className="flex flex-col text-[11px] mt-1.5 text-white/40 leading-tight">
+                            <div>
+                              총전적:{" "}
+                              <span className="text-white/80 font-bold">
+                                {selectedTeam1.stats.wins}승{" "}
+                                {selectedTeam1.stats.losses}패
+                              </span>
+                              <span className="text-viper font-black ml-1">
+                                (
+                                {Math.round(
+                                  (selectedTeam1.stats.wins /
+                                    Math.max(1, selectedTeam1.stats.games)) *
+                                    100,
+                                )}
+                                %)
+                              </span>
+                            </div>
+                            <div className="mt-0.5">
+                              상대전적:{" "}
+                              <span className="text-viper font-black">
+                                {team1H2H
+                                  ? `${team1H2H.wins}승 ${team1H2H.losses}패`
+                                  : "0승 0패"}
+                              </span>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -718,35 +746,44 @@ export function TeamStatsView({ teams, rawMatches }: TeamStatsProps) {
                       </div>
 
                       {/* Right Team block */}
-                      <div className="flex-1 text-left flex flex-col items-start pl-3">
-                        <span className="text-lg font-black text-[#E0E0E0] uppercase tracking-wide">
-                          {selectedTeam2.name}
-                        </span>
-                        <div className="flex flex-col text-xs mt-1.5 text-white/40 leading-tight">
-                          <div>
-                            총전적:{" "}
-                            <span className="text-white/80 font-bold">
-                              {selectedTeam2.stats.wins}승{" "}
-                              {selectedTeam2.stats.losses}패
-                            </span>
-                            <span className="text-viper font-black ml-1">
-                              (
-                              {Math.round(
-                                (selectedTeam2.stats.wins /
-                                  Math.max(1, selectedTeam2.stats.games)) *
-                                  100,
-                              )}
-                              %)
-                            </span>
+                      <div className="flex-1 flex items-center justify-start gap-x-4">
+                        <div className="text-left flex flex-col items-start pl-3">
+                          <span className="text-lg font-black text-[#E0E0E0] uppercase tracking-wide">
+                            {selectedTeam2.name}
+                          </span>
+                          <div className="flex flex-col text-xs mt-1.5 text-white/40 leading-tight">
+                            <div>
+                              총전적:{" "}
+                              <span className="text-white/80 font-bold">
+                                {selectedTeam2.stats.wins}승{" "}
+                                {selectedTeam2.stats.losses}패
+                              </span>
+                              <span className="text-viper font-black ml-1">
+                                (
+                                {Math.round(
+                                  (selectedTeam2.stats.wins /
+                                    Math.max(1, selectedTeam2.stats.games)) *
+                                    100,
+                                )}
+                                %)
+                              </span>
+                            </div>
+                            <div className="mt-0.5">
+                              상대전적:{" "}
+                              <span className="text-viper font-black">
+                                {team2H2H
+                                  ? `${team2H2H.wins}승 ${team2H2H.losses}패`
+                                  : "0승 0패"}
+                              </span>
+                            </div>
                           </div>
-                          <div className="mt-0.5">
-                            상대전적:{" "}
-                            <span className="text-viper font-black">
-                              {team2H2H
-                                ? `${team2H2H.wins}승 ${team2H2H.losses}패`
-                                : "0승 0패"}
-                            </span>
-                          </div>
+                        </div>
+                        <div className="hidden sm:flex flex-col items-center justify-center border border-dashed border-white/10 rounded-xl px-4 py-2 bg-white/[0.015] min-w-[90px] backdrop-blur-[1px]">
+                           <span className="text-[9px] font-black text-viper/50 uppercase tracking-tighter mb-0.5">TEAM KDA</span>
+                           <span className="text-[13px] font-mono font-black text-white">{t2KdaRes}</span>
+                           <div className="w-full h-[1px] bg-white/5 my-1.5"></div>
+                           <span className="text-[9px] font-black text-viper/50 uppercase tracking-tighter mb-0.5">TEAM GOLD</span>
+                           <span className="text-[13px] font-mono font-black text-white">{t2GoldK}</span>
                         </div>
                       </div>
                     </div>
@@ -868,13 +905,13 @@ export function TeamStatsView({ teams, rawMatches }: TeamStatsProps) {
                         {/* Aura Ambient Background Glow for superior player */}
                         {p1Score > p2Score && (
                           <>
-                            <div className="absolute top-0 bottom-0 left-0 w-[45%] bg-gradient-to-r from-viper/[0.04] to-transparent pointer-events-none blur-[6px]" />
+                            <div className="absolute top-0 bottom-0 left-0 w-[45%] advantage-highlight pointer-events-none blur-[2px]" />
                             <div className="absolute top-0 left-0 w-[3px] h-full bg-gradient-to-b from-viper via-viper/50 to-transparent shadow-[0_0_12px_rgba(0,255,65,0.8)]" />
                           </>
                         )}
                         {p2Score > p1Score && (
                           <>
-                            <div className="absolute top-0 bottom-0 right-0 w-[45%] bg-gradient-to-l from-viper/[0.04] to-transparent pointer-events-none blur-[6px]" />
+                            <div className="absolute top-0 bottom-0 right-0 w-[45%] advantage-highlight pointer-events-none blur-[2px]" />
                             <div className="absolute top-0 right-0 w-[3px] h-full bg-gradient-to-b from-viper via-viper/50 to-transparent shadow-[0_0_12px_rgba(0,255,65,0.8)]" />
                           </>
                         )}
@@ -882,19 +919,19 @@ export function TeamStatsView({ teams, rawMatches }: TeamStatsProps) {
                         {/* Single Compact Container - Grid based to prevent overlap entirely */}
                         <div
                           id={`match-role-${role}-row`}
-                          className="relative z-10 grid grid-cols-[90px_1fr_44px_1fr_90px] sm:grid-cols-[110px_1fr_60px_1fr_110px] justify-between items-center gap-3 sm:gap-6 w-full"
+                          className="relative z-10 grid grid-cols-[75px_1fr_44px_1fr_75px] sm:grid-cols-[100px_1fr_60px_1fr_100px] justify-between items-center gap-3 sm:gap-6 w-full"
                         >
                           {/* 1. Left Player */}
-                          <div className="text-left flex flex-col justify-center min-w-0 pr-1">
+                          <div className="text-left flex items-center min-w-0 pr-1 h-full">
                             <span
-                              className={`text-[13px] sm:text-[15px] font-black tracking-wide transition-colors truncate max-w-full leading-none ${p1Score > p2Score ? "text-viper drop-shadow-[0_0_6px_rgba(0,255,65,0.4)]" : "text-[#E0E0E0]"}`}
+                              className={`text-[13px] sm:text-[15px] font-black tracking-wide transition-colors truncate max-w-full block ${p1Score > p2Score ? "text-viper drop-shadow-[0_0_6px_rgba(0,255,65,0.4)]" : "text-[#E0E0E0]"}`}
                             >
                               {p1.name}
                             </span>
                           </div>
 
                           {/* 2. Left Player Stats Area */}
-                          <div className="grid grid-cols-5 gap-1.5 sm:gap-2.5 text-center min-w-0 select-none">
+                          <div className="grid grid-cols-6 gap-1 sm:gap-1.5 text-center min-w-0 select-none">
                             {renderStatCard(
                               "KDA",
                               p1Stats.kdaStr,
@@ -905,6 +942,11 @@ export function TeamStatsView({ teams, rawMatches }: TeamStatsProps) {
                               "GPM",
                               Math.round(p1Stats.gpm),
                               isP1GpmBetter,
+                            )}
+                            {renderStatCard(
+                              "DPG",
+                              p1Stats.dpgStr,
+                              isP1DpgBetter,
                             )}
                             {renderStatCard(
                               "DMG%",
@@ -935,7 +977,7 @@ export function TeamStatsView({ teams, rawMatches }: TeamStatsProps) {
                           </div>
 
                           {/* 4. Right Player Stats Area */}
-                          <div className="grid grid-cols-5 gap-1.5 sm:gap-2.5 text-center min-w-0 select-none">
+                          <div className="grid grid-cols-6 gap-1 sm:gap-1.5 text-center min-w-0 select-none">
                             {renderStatCard(
                               "KDA",
                               p2Stats.kdaStr,
@@ -946,6 +988,11 @@ export function TeamStatsView({ teams, rawMatches }: TeamStatsProps) {
                               "GPM",
                               Math.round(p2Stats.gpm),
                               isP2GpmBetter,
+                            )}
+                            {renderStatCard(
+                              "DPG",
+                              p2Stats.dpgStr,
+                              isP2DpgBetter,
                             )}
                             {renderStatCard(
                               "DMG%",
@@ -960,9 +1007,9 @@ export function TeamStatsView({ teams, rawMatches }: TeamStatsProps) {
                           </div>
 
                           {/* 5. Right Player */}
-                          <div className="text-right flex flex-col justify-center items-end min-w-0 pl-1">
+                          <div className="text-right flex items-center justify-end min-w-0 pl-1 h-full">
                             <span
-                              className={`text-[13px] sm:text-[15px] font-black tracking-wide transition-colors truncate max-w-full leading-none ${p2Score > p1Score ? "text-viper drop-shadow-[0_0_6px_rgba(0,255,65,0.4)]" : "text-[#E0E0E0]"}`}
+                              className={`text-[13px] sm:text-[15px] font-black tracking-wide transition-colors truncate max-w-full block ${p2Score > p1Score ? "text-viper drop-shadow-[0_0_6px_rgba(0,255,65,0.4)]" : "text-[#E0E0E0]"}`}
                             >
                               {p2.name}
                             </span>

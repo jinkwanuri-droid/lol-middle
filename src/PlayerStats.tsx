@@ -142,6 +142,12 @@ export function PlayerStatsView({ teams }: PlayerStatsProps) {
     };
   }, [allPlayers, activeRole, selectedPlayer]);
 
+  const getLineDominanceRate = (player: typeof selectedPlayer) => {
+    if (!player || !roleAvg || roleAvg.kda === 0) return 50;
+    const score = (player.kda / roleAvg.kda) + (player.stats.dpm / roleAvg.dpm) + (player.stats.csm / Math.max(0.1, roleAvg.csm));
+    return Math.max(10, Math.min(95, Math.round((score / 3) * 50)));
+  };
+
   // Helper to generate radar chart data for any specified player
   const getRadarDataForPlayer = (player: typeof selectedPlayer) => {
     if (!player || !roleMax || !roleAvg) return [];
@@ -384,7 +390,7 @@ export function PlayerStatsView({ teams }: PlayerStatsProps) {
                     <td className="p-4">
                       <div className="flex items-center gap-3">
                         <div className="w-1 h-4 bg-white/20 group-hover:bg-[#00FF41] transition-colors"></div>
-                        <span className="font-medium text-sm text-[#E0E0E0]">{p.name} {p.summonerName && <span className="text-[10px] text-white/40 ml-1 font-normal tracking-tight">({p.summonerName})</span>}</span>
+                        <span className="font-medium text-sm text-[#E0E0E0]">{p.name}</span>
                         {activeRole === 'ALL' && (
                           <span className="text-[10px] text-[#00FF41] font-bold border border-[#00FF41]/30 px-1 rounded-sm bg-[#00FF41]/10">{p.role}</span>
                         )}
@@ -438,11 +444,6 @@ export function PlayerStatsView({ teams }: PlayerStatsProps) {
                         <span className={`font-bold text-xs truncate ${selectedPlayerId === p.id ? 'text-viper' : 'text-[#E0E0E0]'}`}>
                           {p.name}
                         </span>
-                        {p.summonerName && (
-                          <span className="text-[9px] text-[#A0A0A0] truncate max-w-[120px] tracking-tight">
-                            ({p.summonerName})
-                          </span>
-                        )}
                         <div className="flex items-center gap-1 uppercase text-[8px] font-bold mt-1">
                           <span className="text-viper/60 tracking-wider">TEAM</span>
                           <span className="text-white/40 truncate">{p.teamName.replace('TEAM ', '')}</span>
@@ -469,9 +470,6 @@ export function PlayerStatsView({ teams }: PlayerStatsProps) {
                         <div className="flex flex-col">
                           <div className="flex items-center gap-2 flex-wrap">
                             <h2 className="text-xl font-black tracking-tight text-[#E0E0E0]">{selectedPlayer.name}</h2>
-                            {selectedPlayer.summonerName && (
-                              <span className="text-sm text-white/40 font-medium tracking-tight">({selectedPlayer.summonerName})</span>
-                            )}
                             <span className="text-[10px] text-viper font-bold border border-viper/30 px-1.5 py-0.5 rounded bg-viper/5 uppercase tracking-widest ml-1">
                               {selectedPlayer.role}
                             </span>
@@ -520,34 +518,40 @@ export function PlayerStatsView({ teams }: PlayerStatsProps) {
                     {chartSubMode === 'INDIVIDUAL' || activeRole === 'ALL' ? (
                       <div className="flex-grow flex flex-col xl:flex-row relative bg-[#0A0A0A] overflow-hidden" id="individual-analysis-panel">
                         {/* Radar Chart Panel */}
-                        <div className="w-full xl:w-5/12 h-64 xl:h-full p-8 flex flex-col justify-center items-center shrink-0 border-b xl:border-b-0 border-[#222222]">
+                        <div className="w-full xl:w-5/12 min-h-[420px] xl:h-full p-6 sm:p-8 flex flex-col justify-start items-center shrink-0 border-b xl:border-b-0 border-[#222222] overflow-y-auto custom-scrollbar">
                           <span className="text-xs text-white/50 font-black uppercase tracking-widest mb-6">주요 지표 비교</span>
                           
-                          {/* 지표 약어 설명 레이어 추가 */}
-                          <div className="flex flex-wrap justify-center gap-x-5 gap-y-2.5 mb-6 px-4 py-3 border-y border-white/[0.05] w-full max-w-md">
-                            <div className="flex items-center gap-2">
-                              <span className="text-[11px] font-black text-viper">KDA</span>
-                              <span className="text-[10px] text-white/45 font-bold uppercase tracking-tight">Kill·Death·Assist</span>
+                          {/* Top Section before chart: Legend (2 Columns) & Dominance Card */}
+                          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center w-full mb-8 pb-6 border-b border-white/[0.05] gap-4 mt-2">
+                            {/* 지표 약어 설명 (좌측 정렬 - 2단 배치) */}
+                            <div className="grid grid-cols-2 gap-x-6 gap-y-2 w-full sm:w-auto mt-1">
+                              {[
+                                { label: 'KDA', desc: 'Kill·Death·Assist' },
+                                { label: 'DPM', desc: 'Dmg per Min' },
+                                { label: 'GPM', desc: 'Gold per Min' },
+                                { label: 'CSM', desc: 'CS per Min' },
+                                { label: 'DPG', desc: 'Dmg per Gold' },
+                                { label: 'DMG%', desc: 'Dmg Share' }
+                              ].map(item => (
+                                <div key={item.label} className="flex items-center gap-2">
+                                  <span className="text-[10px] font-bold text-viper leading-snug w-8">{item.label}</span>
+                                  <span className="text-[7px] text-white/40 font-thin uppercase tracking-tight leading-snug whitespace-nowrap">{item.desc}</span>
+                                </div>
+                              ))}
                             </div>
-                            <div className="flex items-center gap-2">
-                              <span className="text-[11px] font-black text-viper">DPM</span>
-                              <span className="text-[10px] text-white/45 font-bold uppercase tracking-tight">Dmg per Min</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <span className="text-[11px] font-black text-viper">GPM</span>
-                              <span className="text-[10px] text-white/45 font-bold uppercase tracking-tight">Gold per Min</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <span className="text-[11px] font-black text-viper">CSM</span>
-                              <span className="text-[10px] text-white/45 font-bold uppercase tracking-tight">CS per Min</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <span className="text-[11px] font-black text-viper">DPG</span>
-                              <span className="text-[10px] text-white/45 font-bold uppercase tracking-tight">Dmg per Gold</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <span className="text-[11px] font-black text-viper">DMG%</span>
-                              <span className="text-[10px] text-white/45 font-bold uppercase tracking-tight">Dmg Share</span>
+
+                            {/* 라인 우위 비율 섹션 (우측 카드) */}
+                            <div className="flex items-center justify-between sm:justify-start gap-4 bg-[#111111]/80 border border-white/[0.08] px-4 py-3 rounded-xl shrink-0 shadow-[0_8px_30px_rgba(0,0,0,0.5)] w-full sm:w-auto hover:bg-[#161616] hover:border-viper/30 transition-all duration-300">
+                              <div className="flex flex-col gap-0.5">
+                                <span className="text-[10px] text-white/45 font-bold uppercase tracking-widest leading-snug">라인 우위 비율</span>
+                                <span className="text-[8px] text-[#707070] font-light leading-snug tracking-wider">(세트 기준)</span>
+                              </div>
+                              <div className="flex items-end gap-1 shrink-0 pt-1">
+                                <span className="text-2xl font-black text-viper leading-none drop-shadow-[0_0_10px_rgba(0,255,65,0.4)]">
+                                  {getLineDominanceRate(selectedPlayer)}
+                                </span>
+                                <span className="text-xs font-bold text-viper/50 leading-none mb-0.5">%</span>
+                              </div>
                             </div>
                           </div>
 
@@ -583,17 +587,30 @@ export function PlayerStatsView({ teams }: PlayerStatsProps) {
                             <div className="shrink-0 mb-4">
                               <h3 className="text-xs text-white/50 font-black tracking-widest uppercase mb-4 text-center xl:text-left">최근 사용 챔피언 및 승률</h3>
                               <div className="flex flex-wrap gap-3.5 justify-center xl:justify-start">
-                                {selectedPlayer.stats.mostPlayed.map(champ => {
+                                {[...(selectedPlayer.stats.mostPlayed || [])]
+                                  .sort((a, b) => {
+                                    const totalA = (a.wins || 0) + (a.losses || 0);
+                                    const totalB = (b.wins || 0) + (b.losses || 0);
+                                    if (totalB !== totalA) return totalB - totalA;
+                                    return (b.wins || 0) - (a.wins || 0);
+                                  })
+                                  .map(champ => {
                                   const totalGames = champ.wins + champ.losses;
                                   const winRate = totalGames > 0 ? Math.round((champ.wins / totalGames) * 100) : 0;
                                   const isHighWr = winRate >= 60;
                                   return (
-                                    <div key={champ.name} className="bg-[#111111] border border-[#222222] p-3 rounded-lg flex items-center gap-4 pr-5 transition-all hover:border-viper/40 group shadow-md shadow-black/20">
+                                    <div key={champ.name} className="bg-[#111111] border border-[#222222] p-3 rounded-lg flex items-center gap-4 pr-5 transition-all hover:border-viper/40 group/champ shadow-md shadow-black/20" title={champ.name}>
                                       <img 
-                                        src={`https://ddragon.leagueoflegends.com/cdn/14.22.1/img/champion/${champ.id}.png`} 
+                                        src={champ.id === 'Unknown' ? 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzMzMyIvPjx0ZXh0IHg9IjUwIiB5PSI2NSIgZm9udC1zaXplPSI1MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiPj88L3RleHQ+PC9zdmc+' : `https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/${champ.id}.png`} 
                                         alt={champ.name} 
-                                        className="w-11 h-11 rounded-lg border border-white/15 object-cover"
-                                        onError={(e) => { e.currentTarget.src = 'https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/-1.png'; }}
+                                        className="w-11 h-11 rounded-lg border border-white/15 object-cover group-hover/champ:scale-105 transition-transform"
+                                        loading="lazy"
+                                        fetchPriority="high"
+                                        onError={(e) => { 
+                                          if (champ.id !== 'Unknown') {
+                                            e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzMzMyIvPjx0ZXh0IHg9IjUwIiB5PSI2NSIgZm9udC1zaXplPSI1MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiPj88L3RleHQ+PC9zdmc+'; 
+                                          }
+                                        }}
                                       />
                                       <div className="flex flex-col">
                                         <span className="text-xs font-black text-white tracking-tight">{champ.name}</span>
@@ -716,8 +733,14 @@ export function PlayerStatsView({ teams }: PlayerStatsProps) {
 
                                 {/* Footer Stats summary line */}
                                 <div className="flex justify-between items-center text-[11px] font-mono font-bold text-white/40 pt-2 border-t border-[#222222] mt-1.5">
-                                  <span>DPM: <span className="text-white/80">{player.stats.dpm}</span></span>
-                                  <span>DMG%: <span className="text-[#00FF41]">{player.stats.damagePercent}%</span></span>
+                                  <div className="flex gap-3">
+                                    <span>DPM: <span className="text-white/80">{player.stats.dpm}</span></span>
+                                    <span>DMG%: <span className="text-white/80">{player.stats.damagePercent}%</span></span>
+                                  </div>
+                                  <div className="flex items-center gap-1.5 bg-viper/5 px-2 py-0.5 border border-viper/20 rounded">
+                                    <span className="text-[9px] text-viper/70 uppercase font-sans">라인 우위</span>
+                                    <span className="text-[#00FF41] text-[11px]">{getLineDominanceRate(player)}%</span>
+                                  </div>
                                 </div>
                               </motion.div>
                             );

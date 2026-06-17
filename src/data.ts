@@ -1,1353 +1,377 @@
-import { Team, Player, HeadToHeadRecord } from './types';
+import { Team, Player, Role } from './types';
+import { RawMatchRecord } from './matchData';
 
-const rawTeams = [
-  { id: 't1', name: 'TEAM 클리드', score: 980 },
-  { id: 't2', name: 'TEAM 나는상윤', score: 1000 },
-  { id: 't3', name: 'TEAM 스맵', score: 1000 },
-  { id: 't4', name: 'TEAM 저라뎃', score: 1000 },
-  { id: 't5', name: 'TEAM 준밧드', score: 860 },
-  { id: 't6', name: 'TEAM 서도일', score: 1000 },
+// 한글 챔피언 이름을 영문 ID로 변환 (이미지 API용)
+const CHAMPION_MAP: Record<string, string> = {
+  '가렌': 'Garen',
+  '갈리오': 'Galio',
+  '갱플랭크': 'Gangplank',
+  '그라가스': 'Gragas',
+  '그레이브즈': 'Graves',
+  '나르': 'Gnar',
+  '나미': 'Nami',
+  '나수스': 'Nasus',
+  '노틸러스': 'Nautilus',
+  '녹턴': 'Nocturne',
+  '누누와 윌럼프': 'Nunu',
+  '니달리': 'Nidalee',
+  '니코': 'Neeko',
+  '닐라': 'Nilah',
+  '다리우스': 'Darius',
+  '다이애나': 'Diana',
+  '드레이븐': 'Draven',
+  '라이즈': 'Ryze',
+  '라칸': 'Rakan',
+  '람머스': 'Ramus',
+  '럭스': 'Lux',
+  '럼블': 'Rumble',
+  '레나타 글라스크': 'Renata',
+  '레넥톤': 'Renekton',
+  '레오나': 'Leona',
+  '렉사이': 'RekSai',
+  '렐': 'Rell',
+  '렝가': 'Rengar',
+  '루시안': 'Lucian',
+  '룰루': 'Lulu',
+  '르블랑': 'Leblanc',
+  '리 신': 'LeeSin',
+  '리븐': 'Riven',
+  '리산드라': 'Lissandra',
+  '릴리아': 'Lillia',
+  '마스터 이': 'MasterYi',
+  '마오카이': 'Maokai',
+  '말자하': 'Malzahar',
+  '말파이트': 'Malphite',
+  '모데카이저': 'Mordekaiser',
+  '모르가나': 'Morgana',
+  '문도 박사': 'DrMundo',
+  '미스 포츈': 'MissFortune',
+  '밀리오': 'Milio',
+  '바드': 'Bard',
+  '바루스': 'Varus',
+  '바이': 'Vi',
+  '베이가': 'Veigar',
+  '베인': 'Vayne',
+  '벨베스': 'Belveth',
+  '벨코즈': 'Velkoz',
+  '볼리베어': 'Volibear',
+  '브라이어': 'Briar',
+  '브랜드': 'Brand',
+  '브라움': 'Braum',
+  '블라디미르': 'Vladimir',
+  '블리츠크랭크': 'Blitzcrank',
+  '비에고': 'Viego',
+  '빅토르': 'Viktor',
+  '뽀삐': 'Poppy',
+  '사미라': 'Samira',
+  '사이온': 'Sion',
+  '사일러스': 'Sylas',
+  '샤코': 'Shaco',
+  '세나': 'Senna',
+  '세라핀': 'Seraphine',
+  '세주아니': 'Sejuani',
+  '세트': 'Sett',
+  '소나': 'Sona',
+  '소라카': 'Soraka',
+  '쉔': 'Shen',
+  '쉬바나': 'Shivana',
+  '스웨인': 'Swain',
+  '스카너': 'Skarner',
+  '스몰더': 'Smolder',
+  '시비르': 'Sivir',
+  '신 짜오': 'XinZhao',
+  '신드라': 'Syndra',
+  '싱드': 'Singed',
+  '아리': 'Ahri',
+  '아무무': 'Amumu',
+  '아우렐리온 솔': 'AurelionSol',
+  '아이번': 'Ivern',
+  '아지르': 'Azir',
+  '아칼리': 'Akali',
+  '아크샨': 'Akshan',
+  '아트록스': 'Aatrox',
+  '아펠리오스': 'Aphelios',
+  '알리스타': 'Alistar',
+  '암베사': 'Ambessa',
+  '애니': 'Annie',
+  '애니비아': 'Anivia',
+  '애쉬': 'Ashe',
+  '야스오': 'Yasuo',
+  '에코': 'Ekko',
+  '엘리스': 'Elise',
+  '오공': 'MonkeyKing',
+  '오로라': 'Aurora',
+  '오리아나': 'Orianna',
+  '오른': 'Ornn',
+  '올라프': 'Olaf',
+  '요네': 'Yone',
+  '요릭': 'Yorick',
+  '우디르': 'Udir',
+  '우르곳': 'Urgot',
+  '워윅': 'Warwick',
+  '유미': 'Yuumi',
+  '이블린': 'Evelynn',
+  '이즈리얼': 'Ezreal',
+  '일라오이': 'Illaoi',
+  '자르반 4세': 'JarvanIV',
+  '자야': 'Xayah',
+  '자이라': 'Zyra',
+  '자크': 'Zac',
+  '잔나': 'Janna',
+  '잭스': 'Jax',
+  '제드': 'Zed',
+  '제라스': 'Xerath',
+  '제리': 'Zeri',
+  '제이스': 'Jayce',
+  '조이': 'Zoe',
+  '직스': 'Ziggs',
+  '진': 'Jhin',
+  '질리언': 'Zilean',
+  '징크스': 'Jinx',
+  '초가스': 'ChoGath',
+  '카르마': 'Karma',
+  '카밀': 'Camille',
+  '카사딘': 'Kassadin',
+  '카서스': 'Karthus',
+  '카시오페아': 'Cassiopeia',
+  '카이사': 'Kaisa',
+  '카타리나': 'Katarina',
+  '칼리스타': 'Kalista',
+  '케넨': 'Kennen',
+  '케이틀린': 'Caitlyn',
+  '케일': 'Kayle',
+  '케인': 'Kayn',
+  '코그모': 'KogMaw',
+  '코르키': 'Corki',
+  '퀸': 'Quinn',
+  '크산테': 'KSante',
+  '클레드': 'Kled',
+  '키아나': 'Qiyana',
+  '킨드레드': 'Kindred',
+  '타릭': 'Taric',
+  '탈론': 'Talon',
+  '탈리야': 'Taliyah',
+  '탐 켄치': 'TahmKench',
+  '트런들': 'Trundle',
+  '트리스타나': 'Tristana',
+  '트린다미어': 'Tryndamere',
+  '트위스티드 페이트': 'TwistedFate',
+  '트위치': 'Twitch',
+  '티모': 'Teemo',
+  '파이크': 'Pyke',
+  '판테온': 'Pantheon',
+  '피들스틱': 'Fiddlesticks',
+  '피오라': 'Fiora',
+  '피즈': 'Fizz',
+  '하이머딩거': 'Heimerdinger',
+  '헤카림': 'Hecarim',
+  '흐웨이': 'Hwei'
+};
+
+export const getChampionId = (name: string) => CHAMPION_MAP[name] || name;
+
+export const rawTeams = [
+  { id: 't1', name: '클리드', score: 980 },
+  { id: 't2', name: '나는상윤', score: 1000 },
+  { id: 't3', name: '스맵', score: 1000 },
+  { id: 't4', name: '저라뎃', score: 1000 },
+  { id: 't5', name: '준밧드', score: 860 },
+  { id: 't6', name: '서도일', score: 1000 },
 ];
 
-const playersBase = [
+export const playersBase = [
   // TEAM 클리드
-  { teamId: 't1', name: '꿀템은죽었다', summonerName: '난밸래곰팡이다', role: 'TOP', tierScore: 100 },
-  { teamId: 't1', name: '아뚱', summonerName: '동판지구독점yo', role: 'JGL', tierScore: 500 },
-  { teamId: 't1', name: '서건우', summonerName: '캐 치', role: 'MID', tierScore: 290 },
-  { teamId: 't1', name: '엽둥이', summonerName: '앱떡이', role: 'BOT', tierScore: 10 },
-  { teamId: 't1', name: '뿌리', summonerName: '패껄룩', role: 'SUP', tierScore: 80 },
+  { teamId: 't1', name: '클템', summonerName: '난밸래곰팡이다', role: 'TOP' as Role, tierScore: 100 },
+  { teamId: 't1', name: '아뚱', summonerName: '동판지구독점yo', role: 'JGL' as Role, tierScore: 500 },
+  { teamId: 't1', name: '서건우', summonerName: '캐 치', role: 'MID' as Role, tierScore: 290 },
+  { teamId: 't1', name: '엽둥이', summonerName: '앱떡이', role: 'BOT' as Role, tierScore: 10 },
+  { teamId: 't1', name: '뿌리', summonerName: '패껄룩', role: 'SUP' as Role, tierScore: 80 },
   // TEAM 나는상윤
-  { teamId: 't2', name: '꿀탱탱', summonerName: '04 rivenking', role: 'TOP', tierScore: 200 },
-  { teamId: 't2', name: '구스범스', summonerName: '미움받을용기', role: 'JGL', tierScore: 0 },
-  { teamId: 't2', name: '민찬기', summonerName: '잘생기면이레도됨', role: 'MID', tierScore: 170 },
-  { teamId: 't2', name: '깐숙', summonerName: '깐숙', role: 'BOT', tierScore: 470 },
-  { teamId: 't2', name: '김유나', summonerName: '서로 죽여라', role: 'SUP', tierScore: 160 },
+  { teamId: 't2', name: '꿀탱탱', summonerName: '04 rivenking', role: 'TOP' as Role, tierScore: 200 },
+  { teamId: 't2', name: '구스범스', summonerName: '미움받을용기', role: 'JGL' as Role, tierScore: 0 },
+  { teamId: 't2', name: '민찬기', summonerName: '잘생기면이레도됨', role: 'MID' as Role, tierScore: 170 },
+  { teamId: 't2', name: '깐숙', summonerName: '깐숙', role: 'BOT' as Role, tierScore: 470 },
+  { teamId: 't2', name: '김유나', summonerName: '서로 죽여라', role: 'SUP' as Role, tierScore: 160 },
   // TEAM 스맵
-  { teamId: 't3', name: '(주)박사장$', summonerName: '샤프박', role: 'TOP', tierScore: 0 },
-  { teamId: 't3', name: '호진LEE', summonerName: '플진남', role: 'JGL', tierScore: 150 },
-  { teamId: 't3', name: '쪼이.', summonerName: '포 이', role: 'MID', tierScore: 320 },
-  { teamId: 't3', name: '감블러', summonerName: '붕어에몽', role: 'BOT', tierScore: 390 },
-  { teamId: 't3', name: '히엉^^7', summonerName: '히 영', role: 'SUP', tierScore: 140 },
+  { teamId: 't3', name: '박사장', summonerName: '샤프박', role: 'TOP' as Role, tierScore: 0 },
+  { teamId: 't3', name: '호진LEE', summonerName: '플진남', role: 'JGL' as Role, tierScore: 150 },
+  { teamId: 't3', name: '쪼이', summonerName: '포 이', role: 'MID' as Role, tierScore: 320 },
+  { teamId: 't3', name: '감블러', summonerName: '붕어에몽', role: 'BOT' as Role, tierScore: 390 },
+  { teamId: 't3', name: '히엉', summonerName: '히 영', role: 'SUP' as Role, tierScore: 140 },
   // TEAM 저라뎃
-  { teamId: 't4', name: '마두', summonerName: '마두', role: 'TOP', tierScore: 100 },
-  { teamId: 't4', name: '옥맨', summonerName: '옥맨', role: 'JGL', tierScore: 210 },
-  { teamId: 't4', name: '김민교.', summonerName: '김민교', role: 'MID', tierScore: 500 },
-  { teamId: 't4', name: '이경민+_+', summonerName: '이경민', role: 'BOT', tierScore: 140 },
-  { teamId: 't4', name: '대타(손민석)', summonerName: '대타(손민석)', role: 'BOT', tierScore: 140 },
-  { teamId: 't4', name: '한아밍', summonerName: '한아밍', role: 'SUP', tierScore: 0 }, // It was 50 points, wait, let me check the image. "한아밍 0 Point". Ok.
+  { teamId: 't4', name: '마두', summonerName: '마두', role: 'TOP' as Role, tierScore: 100 },
+  { teamId: 't4', name: '옥맨', summonerName: '옥맨', role: 'JGL' as Role, tierScore: 210 },
+  { teamId: 't4', name: '김민교', summonerName: '김민교', role: 'MID' as Role, tierScore: 500 },
+  { teamId: 't4', name: '이경민', summonerName: '이경민', role: 'BOT' as Role, tierScore: 140 },
+  { teamId: 't4', name: '한아밍', summonerName: '한아밍', role: 'SUP' as Role, tierScore: 0 },
   // TEAM 준밧드
-  { teamId: 't5', name: '한포비', summonerName: '포 비', role: 'TOP', tierScore: 10 },
-  { teamId: 't5', name: '이상호', summonerName: '이상호93', role: 'JGL', tierScore: 530 },
-  { teamId: 't5', name: '야옹민지', summonerName: '명명민지', role: 'MID', tierScore: 0 },
-  { teamId: 't5', name: '한남맛종욱', summonerName: '한남맛종욱', role: 'BOT', tierScore: 0 },
-  { teamId: 't5', name: '안녕수야', summonerName: '청사과', role: 'SUP', tierScore: 330 },
+  { teamId: 't5', name: '한포비', summonerName: '포 비', role: 'TOP' as Role, tierScore: 10 },
+  { teamId: 't5', name: '이상호', summonerName: '이상호93', role: 'JGL' as Role, tierScore: 530 },
+  { teamId: 't5', name: '야옹민지', summonerName: '명명민지', role: 'MID' as Role, tierScore: 0 },
+  { teamId: 't5', name: '한남맛종욱', summonerName: '한남맛종욱', role: 'BOT' as Role, tierScore: 0 },
+  { teamId: 't5', name: '안녕수야', summonerName: '청사과', role: 'SUP' as Role, tierScore: 330 },
   // TEAM 서도일
-  { teamId: 't6', name: '눈길.', summonerName: '눈길', role: 'TOP', tierScore: 440 },
-  { teamId: 't6', name: '라파엘ㅋ', summonerName: '라파엘ㅋ', role: 'JGL', tierScore: 10 },
-  { teamId: 't6', name: '김진솔', summonerName: '김 진솔', role: 'MID', tierScore: 40 },
-  { teamId: 't6', name: '종탁이', summonerName: '종탁이93', role: 'BOT', tierScore: 400 },
-  { teamId: 't6', name: '희진이라구', summonerName: 'HEEMORING', role: 'SUP', tierScore: 110 },
+  { teamId: 't6', name: '눈길', summonerName: '눈길', role: 'TOP' as Role, tierScore: 440 },
+  { teamId: 't6', name: '라파엘', summonerName: '라파엘', role: 'JGL' as Role, tierScore: 10 },
+  { teamId: 't6', name: '김진솔', summonerName: '김 진솔', role: 'MID' as Role, tierScore: 40 },
+  { teamId: 't6', name: '종탁이', summonerName: '종탁이93', role: 'BOT' as Role, tierScore: 400 },
+  { teamId: 't6', name: '희진이라구', summonerName: 'HEEMORING', role: 'SUP' as Role, tierScore: 110 },
 ];
 
-const emptyPlayerStats = {
-  games: 0, wins: 0, losses: 0, kills: 0, deaths: 0, assists: 0,
-  damage: 0, vision: 0, cs: 0, dpm: 0, gpm: 0, csm: 0, dpg: 0, damagePercent: 0,
-  mostPlayed: []
-};
-
-const emptyTeamStats = {
-  games: 0, wins: 0, losses: 0, kills: 0, deaths: 0, assists: 0,
-  towers: 0, dragons: 0, barons: 0
-};
-
-// Data from Scrims
-// M1-1: 저라뎃 1:1 나는상윤 (62.03 min)
-// M1-4: 저라뎃 1:1 클리드 (48.48 min)
-// M1-7: 저라뎃 1:1 서도일 (60.00 min)
-
-const duration_total_t4 = 170.51;
-const duration_m1_1 = 62.03;
-const duration_m1_4 = 48.48;
-const duration_m1_7 = 60.00;
-
-const scrim_data = {
-  "저라뎃": {
-    "games": 12,
-    "wins": 7,
-    "losses": 5,
-    "kills": 224,
-    "deaths": 211,
-    "assists": 493,
-    "players": {
-      "마두": {
-        "k": 17,
-        "d": 16,
-        "a": 66,
-        "dmg": 128152,
-        "gold": 64282,
-        "cs": 1314,
-        "champs": [
-          {
-            "name": "암베사",
-            "id": "Ambessa",
-            "wins": 1,
-            "losses": 1
-          },
-          {
-            "name": "초가스",
-            "id": "Chogath",
-            "wins": 1,
-            "losses": 0
-          },
-          {
-            "name": "사이온",
-            "id": "Sion",
-            "wins": 1,
-            "losses": 0
-          },
-          {
-            "name": "아트록스",
-            "id": "Aatrox",
-            "wins": 0,
-            "losses": 2
-          }
-        ]
-      },
-      "옥맨": {
-        "k": 52,
-        "d": 44,
-        "a": 96,
-        "dmg": 176853,
-        "gold": 166755,
-        "cs": 2472,
-        "champs": [
-          {
-            "name": "바이",
-            "id": "Vi",
-            "wins": 1,
-            "losses": 1
-          },
-          {
-            "name": "케인",
-            "id": "Kayn",
-            "wins": 2,
-            "losses": 0
-          },
-          {
-            "name": "자르반 4세",
-            "id": "JarvanIV",
-            "wins": 0,
-            "losses": 1
-          },
-          {
-            "name": "신 짜오",
-            "id": "XinZhao",
-            "wins": 0,
-            "losses": 1
-          }
-        ]
-      },
-      "김민교": {
-        "k": 36,
-        "d": 22,
-        "a": 35,
-        "dmg": 137910,
-        "gold": 72000,
-        "cs": 1430,
-        "champs": [
-          {
-            "name": "사일러스",
-            "id": "Sylas",
-            "wins": 1,
-            "losses": 1
-          },
-          {
-            "name": "요네",
-            "id": "Yone",
-            "wins": 1,
-            "losses": 1
-          },
-          {
-            "name": "라이즈",
-            "id": "Ryze",
-            "wins": 1,
-            "losses": 0
-          },
-          {
-            "name": "카시오페아",
-            "id": "Cassiopeia",
-            "wins": 0,
-            "losses": 1
-          }
-        ]
-      },
-      "이경민": {
-        "k": 30,
-        "d": 31,
-        "a": 47,
-        "dmg": 137793,
-        "gold": 75000,
-        "cs": 1404,
-        "champs": [
-          {
-            "name": "세나",
-            "id": "Senna",
-            "wins": 1,
-            "losses": 1
-          },
-          {
-            "name": "시비르",
-            "id": "Sivir",
-            "wins": 0,
-            "losses": 1
-          },
-          {
-            "name": "애쉬",
-            "id": "Ashe",
-            "wins": 1,
-            "losses": 0
-          },
-          {
-            "name": "카이사",
-            "id": "Kaisa",
-            "wins": 1,
-            "losses": 0
-          },
-          {
-            "name": "잭스",
-            "id": "Jax",
-            "wins": 0,
-            "losses": 1
-          }
-        ]
-      },
-      "한아밍": {
-        "k": 11,
-        "d": 23,
-        "a": 83,
-        "dmg": 49471,
-        "gold": 48000,
-        "cs": 201,
-        "champs": [
-          {
-            "name": "브라움",
-            "id": "Braum",
-            "wins": 1,
-            "losses": 1
-          },
-          {
-            "name": "세라핀",
-            "id": "Seraphine",
-            "wins": 1,
-            "losses": 0
-          },
-          {
-            "name": "밀리오",
-            "id": "Milio",
-            "wins": 0,
-            "losses": 1
-          },
-          {
-            "name": "룰루",
-            "id": "Lulu",
-            "wins": 1,
-            "losses": 0
-          },
-          {
-            "name": "노틸러스",
-            "id": "Nautilus",
-            "wins": 0,
-            "losses": 1
-          }
-        ]
-      },
-      "두호망차": {
-        "k": 14,
-        "d": 12,
-        "a": 41,
-        "dmg": 69018,
-        "gold": 122025,
-        "cs": 1403,
-        "champs": []
-      },
-      "사나이목직한주먹": {
-        "k": 28,
-        "d": 16,
-        "a": 34,
-        "dmg": 72924,
-        "gold": 140139,
-        "cs": 1496,
-        "champs": []
-      },
-      "대타(손민석)": {
-        "k": 31,
-        "d": 24,
-        "a": 38,
-        "dmg": 88166,
-        "gold": 134525,
-        "cs": 1604,
-        "champs": []
-      },
-      "자기야": {
-        "k": 5,
-        "d": 23,
-        "a": 72,
-        "dmg": 42582,
-        "gold": 38494,
-        "cs": 173,
-        "champs": []
-      }
+export function calculateStats(matchRecords: RawMatchRecord[]): Team[] {
+  // 플레이어 통계 맵 생성
+  const playerStatsMap = matchRecords.reduce((acc, match) => {
+    const { playerName, isWin, kills, deaths, assists, damage, gold, cs, duration, championId, championName } = match;
+    
+    if (!acc[playerName]) {
+      acc[playerName] = {
+        games: 0, wins: 0, losses: 0, kills: 0, deaths: 0, assists: 0, 
+        damage: 0, gold: 0, cs: 0, totalDuration: 0, champions: {}
+      };
     }
-  },
-  "나는상윤": {
-    "games": 10,
-    "wins": 3,
-    "losses": 7,
-    "kills": 194,
-    "deaths": 215,
-    "assists": 350,
-    "players": {
-      "04 rivenking": {
-        "k": 45,
-        "d": 44,
-        "a": 37,
-        "dmg": 161244,
-        "gold": 217418,
-        "cs": 2476,
-        "champs": [
-          {
-            "name": "베인",
-            "id": "Vayne",
-            "wins": 1,
-            "losses": 0
-          },
-          {
-            "name": "라이즈",
-            "id": "Ryze",
-            "wins": 0,
-            "losses": 1
-          },
-          {
-            "name": "잭스",
-            "id": "Jax",
-            "wins": 1,
-            "losses": 0
-          }
-        ]
-      },
-      "미움받을용기": {
-        "k": 44,
-        "d": 34,
-        "a": 75,
-        "dmg": 102696,
-        "gold": 118429,
-        "cs": 1945,
-        "champs": [
-          {
-            "name": "리 신",
-            "id": "LeeSin",
-            "wins": 1,
-            "losses": 0
-          },
-          {
-            "name": "녹턴",
-            "id": "Nocturne",
-            "wins": 0,
-            "losses": 1
-          },
-          {
-            "name": "세주아니",
-            "id": "Sejuani",
-            "wins": 1,
-            "losses": 0
-          }
-        ]
-      },
-      "잘생기면이레도됨": {
-        "k": 33,
-        "d": 49,
-        "a": 64,
-        "dmg": 124011,
-        "gold": 145764,
-        "cs": 2679,
-        "champs": [
-          {
-            "name": "오로라",
-            "id": "Aurora",
-            "wins": 0,
-            "losses": 1
-          },
-          {
-            "name": "갈리오",
-            "id": "Galio",
-            "wins": 1,
-            "losses": 0
-          },
-          {
-            "name": "요네",
-            "id": "Yone",
-            "wins": 1,
-            "losses": 0
-          }
-        ]
-      },
-      "깐숙": {
-        "k": 62,
-        "d": 44,
-        "a": 53,
-        "dmg": 200328,
-        "gold": 201027,
-        "cs": 2852,
-        "champs": [
-          {
-            "name": "자야",
-            "id": "Xayah",
-            "wins": 0,
-            "losses": 1
-          },
-          {
-            "name": "애쉬",
-            "id": "Ashe",
-            "wins": 1,
-            "losses": 0
-          },
-          {
-            "name": "케이틀린",
-            "id": "Caitlyn",
-            "wins": 1,
-            "losses": 0
-          }
-        ]
-      },
-      "서로 죽여라": {
-        "k": 6,
-        "d": 44,
-        "a": 121,
-        "dmg": 56026,
-        "gold": 71862,
-        "cs": 280,
-        "champs": [
-          {
-            "name": "노틸러스",
-            "id": "Nautilus",
-            "wins": 0,
-            "losses": 1
-          },
-          {
-            "name": "밀리오",
-            "id": "Milio",
-            "wins": 2,
-            "losses": 0
-          }
-        ]
-      }
-    }
-  },
-  "클리드": {
-    "games": 12,
-    "wins": 9,
-    "losses": 3,
-    "kills": 215,
-    "deaths": 149,
-    "assists": 373,
-    "players": {
-      "난밸래곰팡이다": {
-        "k": 26,
-        "d": 33,
-        "a": 63,
-        "dmg": 138404,
-        "gold": 159541,
-        "cs": 2372,
-        "champs": [
-          {
-            "name": "사이온",
-            "id": "Sion",
-            "wins": 1,
-            "losses": 1
-          },
-          {
-            "name": "요릭",
-            "id": "Yorick",
-            "wins": 1,
-            "losses": 0
-          },
-          {
-            "name": "스웨인",
-            "id": "Swain",
-            "wins": 1,
-            "losses": 0
-          },
-          {
-            "name": "일라오이",
-            "id": "Illaoi",
-            "wins": 1,
-            "losses": 0
-          }
-        ]
-      },
-      "동판지구독점yo": {
-        "k": 51,
-        "d": 27,
-        "a": 103,
-        "dmg": 136251,
-        "gold": 170054,
-        "cs": 2198,
-        "champs": [
-          {
-            "name": "리 신",
-            "id": "LeeSin",
-            "wins": 0,
-            "losses": 1
-          },
-          {
-            "name": "트런들",
-            "id": "Trundle",
-            "wins": 1,
-            "losses": 0
-          },
-          {
-            "name": "자르반 4세",
-            "id": "JarvanIV",
-            "wins": 1,
-            "losses": 0
-          },
-          {
-            "name": "신 짜오",
-            "id": "XinZhao",
-            "wins": 2,
-            "losses": 0
-          }
-        ]
-      },
-      "캐 치": {
-        "k": 19,
-        "d": 16,
-        "a": 34,
-        "dmg": 95471,
-        "gold": 68628,
-        "cs": 1233,
-        "champs": [
-          {
-            "name": "아칼리",
-            "id": "Akali",
-            "wins": 0,
-            "losses": 1
-          },
-          {
-            "name": "라이즈",
-            "id": "Ryze",
-            "wins": 1,
-            "losses": 0
-          },
-          {
-            "name": "카시오페아",
-            "id": "Cassiopeia",
-            "wins": 1,
-            "losses": 0
-          },
-          {
-            "name": "다이애나",
-            "id": "Diana",
-            "wins": 1,
-            "losses": 0
-          }
-        ]
-      },
-      "앱떡이": {
-        "k": 62,
-        "d": 36,
-        "a": 71,
-        "dmg": 193331,
-        "gold": 210969,
-        "cs": 2653,
-        "champs": [
-          {
-            "name": "이즈리얼",
-            "id": "Ezreal",
-            "wins": 0,
-            "losses": 1
-          },
-          {
-            "name": "잭스",
-            "id": "Jax",
-            "wins": 1,
-            "losses": 0
-          },
-          {
-            "name": "애쉬",
-            "id": "Ashe",
-            "wins": 1,
-            "losses": 0
-          },
-          {
-            "name": "징크스",
-            "id": "Jinx",
-            "wins": 1,
-            "losses": 0
-          }
-        ]
-      },
-      "패껄룩": {
-        "k": 20,
-        "d": 26,
-        "a": 113,
-        "dmg": 81286,
-        "gold": 81076,
-        "cs": 330,
-        "champs": [
-          {
-            "name": "세라핀",
-            "id": "Seraphine",
-            "wins": 0,
-            "losses": 1
-          },
-          {
-            "name": "카밀",
-            "id": "Camille",
-            "wins": 1,
-            "losses": 0
-          },
-          {
-            "name": "브라움",
-            "id": "Braum",
-            "wins": 1,
-            "losses": 1
-          },
-          {
-            "name": "룰루",
-            "id": "Lulu",
-            "wins": 1,
-            "losses": 0
-          }
-        ]
-      },
-      "캐치": {
-        "k": 37,
-        "d": 11,
-        "a": 39,
-        "dmg": 71700,
-        "gold": 132004,
-        "cs": 1250,
-        "champs": []
-      }
-    }
-  },
-  "서도일": {
-    "games": 12,
-    "wins": 3,
-    "losses": 9,
-    "kills": 168,
-    "deaths": 234,
-    "assists": 289,
-    "players": {
-      "눈길": {
-        "k": 25,
-        "d": 57,
-        "a": 41,
-        "dmg": 177662,
-        "gold": 198904,
-        "cs": 2391,
-        "champs": [
-          {
-            "name": "트런들",
-            "id": "Trundle",
-            "wins": 0,
-            "losses": 1
-          },
-          {
-            "name": "자크",
-            "id": "Zac",
-            "wins": 1,
-            "losses": 0
-          },
-          {
-            "name": "일라오이",
-            "id": "Illaoi",
-            "wins": 0,
-            "losses": 2
-          },
-          {
-            "name": "요릭",
-            "id": "Yorick",
-            "wins": 0,
-            "losses": 1
-          },
-          {
-            "name": "요네",
-            "id": "Yone",
-            "wins": 0,
-            "losses": 1
-          }
-        ]
-      },
-      "라파엘ㅋ": {
-        "k": 52,
-        "d": 57,
-        "a": 56,
-        "dmg": 154581,
-        "gold": 160299,
-        "cs": 2109,
-        "champs": [
-          {
-            "name": "판테온",
-            "id": "Pantheon",
-            "wins": 0,
-            "losses": 2
-          },
-          {
-            "name": "오공",
-            "id": "MonkeyKing",
-            "wins": 1,
-            "losses": 0
-          },
-          {
-            "name": "스카너",
-            "id": "Skarner",
-            "wins": 0,
-            "losses": 1
-          },
-          {
-            "name": "나피리",
-            "id": "Naafiri",
-            "wins": 0,
-            "losses": 1
-          },
-          {
-            "name": "신 짜오",
-            "id": "XinZhao",
-            "wins": 0,
-            "losses": 1
-          }
-        ]
-      },
-      "김 진솔": {
-        "k": 37,
-        "d": 49,
-        "a": 59,
-        "dmg": 180099,
-        "gold": 180209,
-        "cs": 2572,
-        "champs": [
-          {
-            "name": "라이즈",
-            "id": "Ryze",
-            "wins": 0,
-            "losses": 2
-          },
-          {
-            "name": "빅토르",
-            "id": "Viktor",
-            "wins": 1,
-            "losses": 1
-          },
-          {
-            "name": "사일러스",
-            "id": "Sylas",
-            "wins": 0,
-            "losses": 1
-          },
-          {
-            "name": "신드라",
-            "id": "Syndra",
-            "wins": 0,
-            "losses": 1
-          },
-          {
-            "name": "흐웨이",
-            "id": "Hwei",
-            "wins": 0,
-            "losses": 1
-          }
-        ]
-      },
-      "종탁이93": {
-        "k": 56,
-        "d": 50,
-        "a": 56,
-        "dmg": 227099,
-        "gold": 214892,
-        "cs": 2643,
-        "champs": [
-          {
-            "name": "바루스",
-            "id": "Varus",
-            "wins": 0,
-            "losses": 2
-          },
-          {
-            "name": "칼리스타",
-            "id": "Kalista",
-            "wins": 1,
-            "losses": 0
-          },
-          {
-            "name": "진",
-            "id": "Jhin",
-            "wins": 0,
-            "losses": 1
-          },
-          {
-            "name": "세나",
-            "id": "Senna",
-            "wins": 0,
-            "losses": 1
-          },
-          {
-            "name": "애쉬",
-            "id": "Ashe",
-            "wins": 0,
-            "losses": 1
-          }
-        ]
-      },
-      "HEEMORING": {
-        "k": 12,
-        "d": 51,
-        "a": 99,
-        "dmg": 74649,
-        "gold": 85850,
-        "cs": 344,
-        "champs": [
-          {
-            "name": "블리츠크랭크",
-            "id": "Blitzcrank",
-            "wins": 0,
-            "losses": 2
-          },
-          {
-            "name": "알리스타",
-            "id": "Alistar",
-            "wins": 1,
-            "losses": 0
-          },
-          {
-            "name": "노틸러스",
-            "id": "Nautilus",
-            "wins": 0,
-            "losses": 2
-          },
-          {
-            "name": "세라핀",
-            "id": "Seraphine",
-            "wins": 0,
-            "losses": 1
-          }
-        ]
-      }
-    }
-  },
-  "스맵": {
-    "games": 12,
-    "wins": 8,
-    "losses": 4,
-    "kills": 246,
-    "deaths": 227,
-    "assists": 505,
-    "players": {
-      "샤프박": {
-        "k": 39,
-        "d": 42,
-        "a": 71,
-        "dmg": 193791,
-        "gold": 189086,
-        "cs": 2760,
-        "champs": [
-          {
-            "name": "럼블",
-            "id": "Rumble",
-            "wins": 1,
-            "losses": 1
-          },
-          {
-            "name": "그웬",
-            "id": "Gwen",
-            "wins": 0,
-            "losses": 1
-          },
-          {
-            "name": "레넥톤",
-            "id": "Renekton",
-            "wins": 1,
-            "losses": 0
-          },
-          {
-            "name": "나르",
-            "id": "Gnar",
-            "wins": 2,
-            "losses": 0
-          }
-        ]
-      },
-      "플진남": {
-        "k": 65,
-        "d": 40,
-        "a": 115,
-        "dmg": 150368,
-        "gold": 133381,
-        "cs": 2448,
-        "champs": [
-          {
-            "name": "리 신",
-            "id": "LeeSin",
-            "wins": 2,
-            "losses": 0
-          },
-          {
-            "name": "자르반 4세",
-            "id": "JarvanIV",
-            "wins": 0,
-            "losses": 2
-          },
-          {
-            "name": "스카너",
-            "id": "Skarner",
-            "wins": 1,
-            "losses": 0
-          },
-          {
-            "name": "마오카이",
-            "id": "Maokai",
-            "wins": 1,
-            "losses": 0
-          }
-        ]
-      },
-      "포 이": {
-        "k": 64,
-        "d": 44,
-        "a": 78,
-        "dmg": 171872,
-        "gold": 184531,
-        "cs": 3120,
-        "champs": [
-          {
-            "name": "카시오페아",
-            "id": "Cassiopeia",
-            "wins": 2,
-            "losses": 0
-          },
-          {
-            "name": "라이즈",
-            "id": "Ryze",
-            "wins": 0,
-            "losses": 2
-          },
-          {
-            "name": "신드라",
-            "id": "Syndra",
-            "wins": 1,
-            "losses": 0
-          },
-          {
-            "name": "요네",
-            "id": "Yone",
-            "wins": 1,
-            "losses": 0
-          }
-        ]
-      },
-      "붕어에몽": {
-        "k": 68,
-        "d": 46,
-        "a": 102,
-        "dmg": 228161,
-        "gold": 234432,
-        "cs": 2966,
-        "champs": [
-          {
-            "name": "케이틀린",
-            "id": "Caitlyn",
-            "wins": 1,
-            "losses": 0
-          },
-          {
-            "name": "바루스",
-            "id": "Varus",
-            "wins": 0,
-            "losses": 1
-          },
-          {
-            "name": "이즈리얼",
-            "id": "Ezreal",
-            "wins": 2,
-            "losses": 0
-          },
-          {
-            "name": "루시안",
-            "id": "Lucian",
-            "wins": 1,
-            "losses": 0
-          },
-          {
-            "name": "진",
-            "id": "Jhin",
-            "wins": 0,
-            "losses": 1
-          }
-        ]
-      },
-      "히 영": {
-        "k": 18,
-        "d": 36,
-        "a": 139,
-        "dmg": 97637,
-        "gold": 101184,
-        "cs": 475,
-        "champs": [
-          {
-            "name": "바드",
-            "id": "Bard",
-            "wins": 1,
-            "losses": 0
-          },
-          {
-            "name": "노틸러스",
-            "id": "Nautilus",
-            "wins": 0,
-            "losses": 1
-          },
-          {
-            "name": "카르마",
-            "id": "Karma",
-            "wins": 1,
-            "losses": 1
-          },
-          {
-            "name": "밀리오",
-            "id": "Milio",
-            "wins": 1,
-            "losses": 0
-          },
-          {
-            "name": "니코",
-            "id": "Neeko",
-            "wins": 1,
-            "losses": 0
-          }
-        ]
-      }
-    }
-  },
-  "준밧드": {
-    "games": 10,
-    "wins": 4,
-    "losses": 6,
-    "kills": 159,
-    "deaths": 167,
-    "assists": 306,
-    "players": {
-      "포 비": {
-        "k": 13,
-        "d": 12,
-        "a": 25,
-        "dmg": 93231,
-        "gold": 43000,
-        "cs": 942,
-        "champs": [
-          {
-            "name": "갈리오",
-            "id": "Galio",
-            "wins": 0,
-            "losses": 1
-          },
-          {
-            "name": "사이온",
-            "id": "Sion",
-            "wins": 1,
-            "losses": 0
-          },
-          {
-            "name": "럼블",
-            "id": "Rumble",
-            "wins": 0,
-            "losses": 1
-          },
-          {
-            "name": "암베사",
-            "id": "Ambessa",
-            "wins": 1,
-            "losses": 0
-          }
-        ]
-      },
-      "이상호93": {
-        "k": 62,
-        "d": 36,
-        "a": 71,
-        "dmg": 161139,
-        "gold": 166539,
-        "cs": 2061,
-        "champs": [
-          {
-            "name": "오공",
-            "id": "MonkeyKing",
-            "wins": 0,
-            "losses": 1
-          },
-          {
-            "name": "판테온",
-            "id": "Pantheon",
-            "wins": 1,
-            "losses": 0
-          },
-          {
-            "name": "리 신",
-            "id": "LeeSin",
-            "wins": 0,
-            "losses": 1
-          },
-          {
-            "name": "트런들",
-            "id": "Trundle",
-            "wins": 1,
-            "losses": 0
-          }
-        ]
-      },
-      "명명민지": {
-        "k": 32,
-        "d": 25,
-        "a": 76,
-        "dmg": 183413,
-        "gold": 185215,
-        "cs": 2506,
-        "champs": [
-          {
-            "name": "흐웨이",
-            "id": "Hwei",
-            "wins": 0,
-            "losses": 1
-          },
-          {
-            "name": "카르마",
-            "id": "Karma",
-            "wins": 1,
-            "losses": 0
-          },
-          {
-            "name": "아리",
-            "id": "Ahri",
-            "wins": 0,
-            "losses": 1
-          },
-          {
-            "name": "조이",
-            "id": "Zoe",
-            "wins": 1,
-            "losses": 0
-          }
-        ]
-      },
-      "한남맛종욱": {
-        "k": 49,
-        "d": 39,
-        "a": 71,
-        "dmg": 206957,
-        "gold": 194650,
-        "cs": 2657,
-        "champs": [
-          {
-            "name": "애쉬",
-            "id": "Ashe",
-            "wins": 0,
-            "losses": 1
-          },
-          {
-            "name": "이즈리얼",
-            "id": "Ezreal",
-            "wins": 1,
-            "losses": 0
-          },
-          {
-            "name": "진",
-            "id": "Jhin",
-            "wins": 0,
-            "losses": 1
-          },
-          {
-            "name": "이즈리얼",
-            "id": "Ezreal",
-            "wins": 1,
-            "losses": 0
-          }
-        ]
-      },
-      "청사과": {
-        "k": 9,
-        "d": 43,
-        "a": 119,
-        "dmg": 82963,
-        "gold": 73337,
-        "cs": 361,
-        "champs": [
-          {
-            "name": "세라핀",
-            "id": "Seraphine",
-            "wins": 0,
-            "losses": 1
-          },
-          {
-            "name": "브라움",
-            "id": "Braum",
-            "wins": 1,
-            "losses": 0
-          },
-          {
-            "name": "카르마",
-            "id": "Karma",
-            "wins": 0,
-            "losses": 1
-          },
-          {
-            "name": "바드",
-            "id": "Bard",
-            "wins": 1,
-            "losses": 0
-          }
-        ]
-      },
-      "포비": {
-        "k": 15,
-        "d": 17,
-        "a": 38,
-        "dmg": 65760,
-        "gold": 120001,
-        "cs": 1347,
-        "champs": []
-      }
-    }
-  }
-};
 
-export const initialTeams: Team[] = rawTeams.map(rt => {
-  let tStats = { ...emptyTeamStats };
-  let currentDur = 1;
-  
-  if (rt.name === 'TEAM 저라뎃') {
-    tStats = { ...tStats, ...scrim_data.저라뎃 };
-    currentDur = 170.51 + 181.68;
-  } else if (rt.name === 'TEAM 나는상윤') {
-    tStats = { ...tStats, ...scrim_data.나는상윤 };
-    currentDur = 135.06 + 187.71; 
-  } else if (rt.name === 'TEAM 클리드') {
-    tStats = { ...tStats, ...scrim_data.클리드 };
-    currentDur = 153.88 + 159.03; 
-  } else if (rt.name === 'TEAM 서도일') {
-    tStats = { ...tStats, ...scrim_data.서도일 };
-    currentDur = 153.57 + 161.91; 
-  } else if (rt.name === 'TEAM 스맵') {
-    tStats = { ...tStats, ...scrim_data.스맵 };
-    currentDur = 168.51 + 189.05; 
-  } else if (rt.name === 'TEAM 준밧드') {
-    tStats = { ...tStats, ...scrim_data.준밧드 };
-    currentDur = 136.31 + 182.86; 
-  }
+    const p = acc[playerName];
+    p.games += 1;
+    if (isWin) p.wins += 1; else p.losses += 1;
+    p.kills += kills;
+    p.deaths += deaths;
+    p.assists += assists;
+    p.damage += damage;
+    p.gold += gold;
+    p.cs += cs;
+    p.totalDuration += duration;
+    
+    const champId = getChampionId(championName);
+    if (!p.champions[champId]) {
+      p.champions[champId] = { id: champId, name: championName, games: 0, wins: 0, losses: 0 };
+    }
+    p.champions[champId].games += 1;
+    if (isWin) p.champions[champId].wins += 1;
+    else p.champions[champId].losses += 1;
 
-  const tPlayers: Player[] = playersBase
-    .filter(p => p.teamId === rt.id)
-    .map((p, idx) => {
-      let pStats = { ...emptyPlayerStats };
+    return acc;
+  }, {} as Record<string, any>);
+
+  return rawTeams.map(team => {
+    const teamRecords = matchRecords.filter(m => m.teamName === `TEAM ${team.name}`);
+    const gameIds = Array.from(new Set(teamRecords.map(r => `${r.matchId}#${r.gameNum}`)));
+    
+    let teamWins = 0;
+    let teamLosses = 0;
+    let teamKills = 0;
+    let teamDeaths = 0;
+    let teamAssists = 0;
+    
+    gameIds.forEach(gameId => {
+      const [matchId, gameNumStr] = gameId.split('#');
+      const gameNum = parseInt(gameNumStr);
+      const gameRecords = teamRecords.filter(r => r.matchId === matchId && r.gameNum === gameNum);
+      if (gameRecords.length > 0 && gameRecords[0].isWin) teamWins++;
+      else if (gameRecords.length > 0) teamLosses++;
       
-      const pSummonerName = (p as any).summonerName || p.name;
-      const sData = 
-          rt.name === 'TEAM 저라뎃' ? (scrim_data.저라뎃.players as any)[pSummonerName]
-        : rt.name === 'TEAM 나는상윤' ? (scrim_data.나는상윤.players as any)[pSummonerName]
-        : rt.name === 'TEAM 클리드' ? (scrim_data.클리드.players as any)[pSummonerName]
-        : rt.name === 'TEAM 서도일' ? (scrim_data.서도일.players as any)[pSummonerName]
-        : rt.name === 'TEAM 스맵' ? (scrim_data.스맵.players as any)[pSummonerName]
-        : rt.name === 'TEAM 준밧드' ? (scrim_data.준밧드.players as any)[pSummonerName]
-        : null;
+      gameRecords.forEach(r => {
+        teamKills += r.kills;
+        teamDeaths += r.deaths;
+        teamAssists += r.assists;
+      });
+    });
 
-      let playerDur = currentDur;
-      if (pSummonerName === '이경민') {
-        playerDur = 170.51; // Day 1 duration
-      } else if (pSummonerName === '대타(손민석)') {
-        playerDur = 181.68; // Day 2 duration
-      }
-
-      if (sData) {
-        const teamPlayers = (scrim_data as any)[rt.name.replace('TEAM ', '')].players;
-        const teamTotalDmg: number = (Object.values(teamPlayers).reduce((acc: number, curr: any) => acc + (curr.dmg || 0), 0) as number) || 1;
-        pStats = {
-          games: (tStats as any).games,
-          wins: (tStats as any).wins,
-          losses: (tStats as any).losses,
-          kills: sData.k,
-          deaths: sData.d,
-          assists: sData.a,
-          damage: sData.dmg,
-          vision: 0,
-          cs: sData.cs || 0,
-          dpm: Math.floor(sData.dmg / playerDur),
-          gpm: Math.floor((sData.gold || 0) / playerDur),
-          csm: Number(((sData.cs || 0) / playerDur).toFixed(2)),
-          dpg: Number(((sData.dmg || 0) / (sData.gold || 1)).toFixed(2)),
-          damagePercent: Number(((sData.dmg / teamTotalDmg) * 100).toFixed(1)),
-          mostPlayed: sData.champs || []
+    return {
+      id: team.id,
+      name: `TEAM ${team.name}`,
+      totalScore: team.score,
+      stats: {
+        games: teamWins + teamLosses,
+        wins: teamWins,
+        losses: teamLosses,
+        kills: teamKills,
+        deaths: teamDeaths,
+        assists: teamAssists,
+        towers: 0,
+        dragons: 0,
+        barons: 0
+      },
+      players: playersBase.filter(p => p.teamId === team.id).map((pBase, idx) => {
+        const stats = playerStatsMap[pBase.name] || {
+          games: 0, wins: 0, losses: 0, kills: 0, deaths: 0, assists: 0,
+          damage: 0, gold: 0, cs: 0, totalDuration: 0, champions: {}
         };
-      }
+        
+        const totalMin = stats.totalDuration / 60;
+        
+        // 팀 전체 데미지 계산 (비중 산출용)
+        const teamPlayers = playersBase.filter(pb => pb.teamId === team.id);
+        const teamTotalDamage = teamPlayers.reduce((sum, tp) => {
+          const pStats = playerStatsMap[tp.name];
+          return sum + (pStats ? pStats.damage : 0);
+        }, 0);
 
-      return {
-        id: `${rt.id}_p${idx}`,
-        name: p.name,
-        role: p.role as any,
-        teamId: rt.id,
-        tierScore: p.tierScore,
-        stats: pStats,
-      };
-    });
+        const damagePercent = teamTotalDamage > 0 
+          ? parseFloat(((stats.damage / teamTotalDamage) * 100).toFixed(1)) 
+          : 0;
 
-  const headToHead: HeadToHeadRecord[] = rawTeams
-    .filter(o => o.id !== rt.id)
-    .map(o => {
-      let wins = 0;
-      let losses = 0;
-      
-      const checkResult = (t1: string, t2: string, matchT1: string, matchT2: string, t1Wins: number, t2Wins: number) => {
-        if ((t1 === matchT1 && t2 === matchT2) || (t1 === matchT2 && t2 === matchT1)) {
-          if (t1 === matchT1) { wins += t1Wins; losses += t2Wins; }
-          else { wins += t2Wins; losses += t1Wins; }
-        }
-      };
+        const topChamps = Object.entries(stats.champions)
+          .sort((a: any, b: any) => b[1].games - a[1].games)
+          .slice(0, 5)
+          .map(([id, info]: [string, any]) => ({
+            id,
+            name: info.name,
+            wins: info.wins,
+            losses: info.losses
+          }));
 
-      const myName = rt.name.replace('TEAM ', '');
-      const oppName = o.name.replace('TEAM ', '');
+        return {
+          id: `${team.id}-p${idx}`,
+          name: pBase.name,
+          summonerName: pBase.summonerName,
+          role: pBase.role,
+          teamId: team.id,
+          tierScore: pBase.tierScore,
+          stats: {
+            games: stats.games,
+            wins: stats.wins,
+            losses: stats.losses,
+            kills: stats.kills,
+            deaths: stats.deaths,
+            assists: stats.assists,
+            damage: stats.damage,
+            vision: 0,
+            cs: stats.cs,
+            dpm: totalMin > 0 ? Math.round(stats.damage / totalMin) : 0,
+            gpm: totalMin > 0 ? Math.round(stats.gold / totalMin) : 0,
+            csm: totalMin > 0 ? parseFloat((stats.cs / totalMin).toFixed(1)) : 0,
+            dpg: stats.gold > 0 ? parseFloat((stats.damage / stats.gold).toFixed(2)) : 0,
+            winRate: stats.games > 0 ? (stats.wins / stats.games) * 100 : 0,
+            damagePercent: damagePercent,
+            mostPlayed: topChamps
+          }
+        } as Player;
+      }),
+      headToHead: rawTeams.filter(t => t.id !== team.id).map(opponent => {
+        const h2hMatches = matchRecords.filter(m => 
+          m.teamName === `TEAM ${team.name}` && 
+          matchRecords.some(om => om.teamName === `TEAM ${opponent.name}` && om.matchId === m.matchId && om.gameNum === m.gameNum)
+        );
+        
+        const h2hGameIds = Array.from(new Set(h2hMatches.map(r => `${r.matchId}#${r.gameNum}`)));
+        let wins = 0;
+        let losses = 0;
+        
+        h2hGameIds.forEach(gameId => {
+          const [matchId, gameNumStr] = gameId.split('#');
+          const gameNum = parseInt(gameNumStr);
+          const sample = h2hMatches.find(r => r.matchId === matchId && r.gameNum === gameNum);
+          if (sample?.isWin) wins++;
+          else if (sample) losses++;
+        });
 
-      // Day 1
-      checkResult(myName, oppName, '저라뎃', '나는상윤', 1, 1);
-      checkResult(myName, oppName, '저라뎃', '클리드', 1, 1);
-      checkResult(myName, oppName, '저라뎃', '서도일', 1, 1);
-      checkResult(myName, oppName, '준밧드', '스맵', 1, 1);
-      checkResult(myName, oppName, '클리드', '서도일', 2, 0);
-      checkResult(myName, oppName, '준밧드', '나는상윤', 1, 1);
-      checkResult(myName, oppName, '스맵', '서도일', 2, 0);
-      checkResult(myName, oppName, '클리드', '스맵', 1, 1);
-      
-      // Day 2
-      checkResult(myName, oppName, '준밧드', '클리드', 1, 1);
-      checkResult(myName, oppName, '서도일', '나는상윤', 1, 1);
-      checkResult(myName, oppName, '저라뎃', '스맵', 2, 0);
-      checkResult(myName, oppName, '클리드', '나는상윤', 2, 0);
-      checkResult(myName, oppName, '스맵', '서도일', 2, 0);
-      checkResult(myName, oppName, '저라뎃', '준밧드', 2, 0);
-      checkResult(myName, oppName, '클리드', '저라뎃', 2, 0);
-      checkResult(myName, oppName, '준밧드', '서도일', 1, 1);
-      checkResult(myName, oppName, '스맵', '나는상윤', 2, 1);
-
-      return {
-        opponentId: o.id,
-        opponentName: o.name,
-        wins,
-        losses,
-      };
-    });
-
-  return {
-    id: rt.id,
-    name: rt.name,
-    totalScore: rt.score,
-    stats: tStats,
-    players: tPlayers,
-    headToHead,
-  };
-});
+        return {
+          opponentId: opponent.id,
+          opponentName: `TEAM ${opponent.name}`,
+          wins,
+          losses
+        };
+      })
+    };
+  });
+}

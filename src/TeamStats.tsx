@@ -922,7 +922,7 @@ export function TeamStatsView({ teams, rawMatches }: TeamStatsProps) {
                           className="relative z-10 grid grid-cols-[75px_1fr_44px_1fr_75px] sm:grid-cols-[100px_1fr_60px_1fr_100px] justify-between items-center gap-3 sm:gap-6 w-full"
                         >
                           {/* 1. Left Player */}
-                          <div className="text-left flex items-center min-w-0 pr-1 h-full">
+                          <div className="text-left flex items-center min-w-0 pr-1">
                             <span
                               className={`text-[13px] sm:text-[15px] font-black tracking-wide transition-colors truncate max-w-full block ${p1Score > p2Score ? "text-viper drop-shadow-[0_0_6px_rgba(0,255,65,0.4)]" : "text-[#E0E0E0]"}`}
                             >
@@ -937,10 +937,10 @@ export function TeamStatsView({ teams, rawMatches }: TeamStatsProps) {
                               p1Stats.kdaStr,
                               isP1KdaBetter,
                             )}
-                            {renderStatCard("DPM", p1Stats.dpm, isP1DpmBetter)}
+                            {renderStatCard("DPM", p1Stats.dpm.toString(), isP1DpmBetter)}
                             {renderStatCard(
                               "GPM",
-                              Math.round(p1Stats.gpm),
+                              Math.round(p1Stats.gpm).toString(),
                               isP1GpmBetter,
                             )}
                             {renderStatCard(
@@ -955,7 +955,7 @@ export function TeamStatsView({ teams, rawMatches }: TeamStatsProps) {
                             )}
                             {renderStatCard(
                               "CS",
-                              csRecord ? p1AvgCs : "-",
+                              csRecord ? p1AvgCs.toString() : "-",
                               isP1CsBetter,
                             )}
                           </div>
@@ -983,10 +983,10 @@ export function TeamStatsView({ teams, rawMatches }: TeamStatsProps) {
                               p2Stats.kdaStr,
                               isP2KdaBetter,
                             )}
-                            {renderStatCard("DPM", p2Stats.dpm, isP2DpmBetter)}
+                            {renderStatCard("DPM", p2Stats.dpm.toString(), isP2DpmBetter)}
                             {renderStatCard(
                               "GPM",
-                              Math.round(p2Stats.gpm),
+                              Math.round(p2Stats.gpm).toString(),
                               isP2GpmBetter,
                             )}
                             {renderStatCard(
@@ -1001,13 +1001,13 @@ export function TeamStatsView({ teams, rawMatches }: TeamStatsProps) {
                             )}
                             {renderStatCard(
                               "CS",
-                              csRecord ? p2AvgCs : "-",
+                              csRecord ? p2AvgCs.toString() : "-",
                               isP2CsBetter,
                             )}
                           </div>
 
                           {/* 5. Right Player */}
-                          <div className="text-right flex items-center justify-end min-w-0 pl-1 h-full">
+                          <div className="text-right flex items-center justify-end min-w-0 pl-1">
                             <span
                               className={`text-[13px] sm:text-[15px] font-black tracking-wide transition-colors truncate max-w-full block ${p2Score > p1Score ? "text-viper drop-shadow-[0_0_6px_rgba(0,255,65,0.4)]" : "text-[#E0E0E0]"}`}
                             >

@@ -53,8 +53,8 @@ function isValidCsv(data: any): boolean {
 
 app.get("/api/matches", async (req, res) => {
   try {
-    const spreadsheetId = process.env.VITE_GOOGLE_SHEET_ID;
-    const appsScriptUrl = process.env.VITE_APPS_SCRIPT_URL;
+    const spreadsheetId = process.env.VITE_GOOGLE_SHEET_ID || process.env.GOOGLE_SHEET_ID;
+    const appsScriptUrl = process.env.VITE_APPS_SCRIPT_URL || process.env.APPS_SCRIPT_URL;
 
     if (!spreadsheetId && !appsScriptUrl) {
       return res.status(400).json({ 

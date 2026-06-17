@@ -136,9 +136,9 @@ html, body {
 }
 
 .advantage-highlight {
-  background: linear-gradient(90deg, transparent 0%, rgba(0, 255, 65, 0.15) 50%, transparent 100%);
-  background-size: 200% 100%;
-  animation: advantage-flow 6s ease-in-out infinite alternate;
+  background: linear-gradient(90deg, transparent 0%, rgba(0, 255, 65, 0.1) 40%, rgba(0, 255, 65, 0.1) 60%, transparent 100%);
+  background-size: 300% 100%;
+  animation: advantage-flow 5s ease-in-out infinite alternate;
 }
 
 /* Google Sign-In Button Styles */

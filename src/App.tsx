@@ -35,7 +35,7 @@ export default function App() {
         } else {
           const text = await response.text();
           console.error("Non-JSON error response:", text);
-          throw new Error(`서버 오류 (HTTP ${response.status}). 시트 아이디가 정확한지, 혹은 환경변수(VITE_GOOGLE_SHEET_ID)가 설정되었는지 확인해주세요.`);
+          throw new Error(`서버 오류 (HTTP ${response.status}). 시트 아이디나 스크립트 URL이 정확한지, 혹은 환경변수가 설정되었는지 확인해주세요.`);
         }
       }
       const matches = await response.json();
